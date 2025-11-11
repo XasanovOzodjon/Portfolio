@@ -7,3 +7,7 @@ echo "DB_USER=" >> .env
 echo "DB_PASSWORD=" >> .env
 echo "DB_HOST=" >> .env
 echo "DB_PORT=" >> .env
+echo "" >> .env
+echo "# Telegram Bot configuration" >> .env
+echo "TOKEN=" >> .env
+echo "CHAT_ID=" >> .env
