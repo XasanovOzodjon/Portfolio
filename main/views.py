@@ -5,7 +5,6 @@ This module contains all the view functions for handling portfolio
 data display and contact form submissions.
 """
 
-import logging
 import requests
 
 from django.shortcuts import render, redirect
@@ -24,8 +23,6 @@ from .models import (
 from core.settings import TOKEN, CHAT_ID
 
 
-# Logger setup
-logger = logging.getLogger(__name__)
 
 
 def get_full_portfolio_data():
@@ -39,13 +36,11 @@ def get_full_portfolio_data():
     skills = user.skills.all() if user else []
     projects = Project.objects.all() if user else []
     
-    # Add key achievements to each project
     for project in projects:
         project.key_achievements_list = project.key_achievements.all()
     
     impact_and_achievements = ImpactAndAchievementsGlobal.objects.all()
     
-    # Get achievements and items for each global impact
     for global_impact in impact_and_achievements:
         global_impact.achievements = global_impact.impact_achievements_items.all()
         for achievement in global_impact.achievements:
@@ -68,9 +63,9 @@ def send_telegram_message(name, email, message, source="Portfolio"):
     """
     telegram_message = (
         f"{source} sahifasidan xabar:\n\n"
-        f"Name🫡: {name}\n"
-        f"Email📩: {email}\n"
-        f"Message🔤: {message}"
+        f"Name: {name}\n"
+        f"Email: {email}\n"
+        f"Message: {message}"
     )
     url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
     payload = {
@@ -83,13 +78,13 @@ def send_telegram_message(name, email, message, source="Portfolio"):
         if response.status_code == 200:
             return True, 'Xabaringiz muvaffaqiyatli yuborildi! ✅'
         else:
-            logger.error(f"Telegram API error: {response.status_code}")
+            print(f"Telegram API error: {response.status_code}")
             return False, 'Xatolik yuz berdi, qayta urinib ko\'ring.'
     except requests.exceptions.Timeout:
-        logger.error("Telegram API timeout")
+        print("Telegram API timeout")
         return False, 'Xabar yuborishda vaqt tugadi, qayta urinib ko\'ring.'
     except Exception as e:
-        logger.error(f"Telegram message sending error: {e}")
+        print(f"Telegram message sending error: {e}")
         return False, 'Xatolik yuz berdi, qayta urinib ko\'ring.'
 
 
@@ -117,7 +112,6 @@ def home_view(request: HttpRequest) -> HttpResponse:
         email = request.POST.get('email')
         message = request.POST.get('message')
         
-        # Validate input
         if not all([name, email, message]):
             messages.error(request, 'Barcha maydonlarni to\'ldiring.')
             return redirect('home')
