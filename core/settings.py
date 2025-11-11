@@ -32,6 +32,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 
+AUTH_USER_MODEL = 'main.User'
 # Application definition
 
 INSTALLED_APPS = [
