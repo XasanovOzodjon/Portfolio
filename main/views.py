@@ -79,13 +79,13 @@ def send_telegram_message(name, email, message, source="Portfolio"):
             return True, 'Your message has been sent successfully! ✅'
         else:
             print(f"Telegram API error: {response.status_code}")
-            return False, 'Xatolik yuz berdi, qayta urinib ko\'ring.'
+            return False, 'An error occurred, please try again.'
     except requests.exceptions.Timeout:
         print("Telegram API timeout")
-        return False, 'Xabar yuborishda vaqt tugadi, qayta urinib ko\'ring.'
+        return False, 'The message timed out, please try again.'
     except Exception as e:
         print(f"Telegram message sending error: {e}")
-        return False, 'Xatolik yuz berdi, qayta urinib ko\'ring.'
+        return False, 'An error occurred, please try again.'
 
 
 def home_view(request: HttpRequest) -> HttpResponse:
