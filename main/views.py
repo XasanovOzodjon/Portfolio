@@ -76,7 +76,7 @@ def send_telegram_message(name, email, message, source="Portfolio"):
     try:
         response = requests.post(url, data=payload, timeout=10)
         if response.status_code == 200:
-            return True, 'Xabaringiz muvaffaqiyatli yuborildi! ✅'
+            return True, 'Your message has been sent successfully! ✅'
         else:
             print(f"Telegram API error: {response.status_code}")
             return False, 'Xatolik yuz berdi, qayta urinib ko\'ring.'
