@@ -3,7 +3,7 @@
 ## Server ma'lumotlari
 - **IP:** 13.51.157.116
 - **Domen:** khasanoff.uz
-- **Loyiha joylashuvi:** /ubuntu/app/portfolio
+- **Loyiha joylashuvi:** /home/ubuntu/app/portfolio
 
 ## Server tayyorlash
 
@@ -15,14 +15,14 @@ sudo apt install python3 python3-pip python3-venv nginx postgresql postgresql-co
 
 ### 2. Loyihani serverga ko'chirish
 ```bash
-sudo mkdir -p /ubuntu/app/portfolio
-sudo chown -R $USER:$USER /ubuntu/app/portfolio
-git clone <your-repo-url> /ubuntu/app/portfolio
+sudo mkdir -p /home/ubuntu/app/portfolio
+sudo chown -R $USER:$USER /home/ubuntu/app/portfolio
+git clone <your-repo-url> /home/ubuntu/app/portfolio
 ```
 
 ### 3. Virtual environment yaratish
 ```bash
-cd /ubuntu/app/portfolio
+cd /home/ubuntu/app/portfolio
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
@@ -31,7 +31,7 @@ pip install gunicorn
 
 ### 4. .env faylini yaratish
 ```bash
-nano /ubuntu/app/portfolio/.env
+nano /home/ubuntu/app/portfolio/.env
 ```
 
 Quyidagilarni qo'shing:
@@ -69,7 +69,7 @@ GRANT ALL PRIVILEGES ON DATABASE portfolio_db TO portfolio_user;
 
 ### 6. Django migratsiyalar
 ```bash
-cd /ubuntu/app/portfolio
+cd /home/ubuntu/app/portfolio
 source venv/bin/activate
 python manage.py migrate
 python manage.py collectstatic --noinput

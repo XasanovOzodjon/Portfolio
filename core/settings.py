@@ -31,12 +31,16 @@ DEBUG = config("DEBUG", default=False, cast=bool)
 
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost", cast=Csv())
 
-CSRF_TRUSTED_ORIGINS=['https://khasanoff.uz','http://www.khasanoff.uz','http://13.51.157.116']
+CSRF_TRUSTED_ORIGINS = ['https://khasanoff.uz', 'https://www.khasanoff.uz', 'https://13.51.157.116']
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_SSL_REDIRECT = True
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
 X_FRAME_OPTIONS = 'DENY'
 
 TOKEN = config("TOKEN")
