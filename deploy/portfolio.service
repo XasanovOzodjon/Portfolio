@@ -1,0 +1,16 @@
+[Unit]
+Description=Portfolio Django Application
+After=network.target
+
+[Service]
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/ubuntu/app/portfolio
+Environment="PATH=/ubuntu/app/portfolio/venv/bin"
+EnvironmentFile=/ubuntu/app/portfolio/.env
+ExecStart=/ubuntu/app/portfolio/venv/bin/gunicorn --workers 3 --bind unix:/ubuntu/app/portfolio/portfolio.sock core.wsgi:application
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
