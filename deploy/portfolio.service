@@ -8,7 +8,7 @@ Group=ubuntu
 WorkingDirectory=/home/ubuntu/app/portfolio
 Environment="PATH=/home/ubuntu/app/portfolio/venv/bin"
 EnvironmentFile=/home/ubuntu/app/portfolio/.env
-ExecStart=/home/ubuntu/app/portfolio/venv/bin/gunicorn --workers 3 --bind unix:/home/ubuntu/app/portfolio/portfolio.sock core.wsgi:application
+ExecStart=/home/ubuntu/app/portfolio/venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8000 core.wsgi:application
 Restart=always
 RestartSec=3
 
