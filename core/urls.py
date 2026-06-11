@@ -26,16 +26,22 @@ from main.views import home_view
 def robots_txt(request):
     content = """User-agent: *
 Allow: /
-
 Sitemap: https://khasanoff.uz/sitemap.xml
 """
     return HttpResponse(content, content_type="text/plain")
+
+
+def yandex_verification(request):
+    file_path = settings.BASE_DIR / 'yandex_cb88068b0f682954.html'
+    with open(file_path, encoding='utf-8') as f:
+        return HttpResponse(f.read(), content_type='text/html; charset=UTF-8')
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home_view, name='home'),
     path('robots.txt', robots_txt, name='robots_txt'),
+    path('yandex_cb88068b0f682954.html', yandex_verification, name='yandex_verification'),
     path('favicon.ico', RedirectView.as_view(url=settings.STATIC_URL + 'favicon.ico', permanent=True)),
 ]
 

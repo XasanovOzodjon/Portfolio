@@ -24,7 +24,7 @@
     <meta name="googlebot" content="index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1" />
     <link rel="canonical" href="https://khasanoff.uz/" />
     <meta name="format-detection" content="telephone=no, email=no" />
-    <meta property="og:title" content="{% if user %}{% if user.first_name or user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %}{% if user.professional_title %} — {{ user.professional_title }}{% endif %}{% else %}Khasanoff.uz{% endif %}" />
+    <meta property="og:title" content="{% if user and user.last_name %}{{ user.last_name }} - Backend Programer{% elif user %}{{ user.username }} - Backend Programer{% else %}Khasanoff - Backend Programer{% endif %}" />
     <meta property="og:description" content="{% if user %}{% if user.professional_title %}{{ user.professional_title }}. {% endif %}Backend dasturchi portfoliyasi — loyihalar, ko'nikmalar va aloqa.{% else %}Backend dasturchi portfoliyasi{% endif %}" />
     <meta property="og:url" content="https://khasanoff.uz/" />
     <meta property="og:site_name" content="khasanoff.uz" />
@@ -35,7 +35,7 @@
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="{% if user %}{% if user.first_name or user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %} — backend dasturchi portfoliyasi{% else %}Khasanoff.uz portfoliyasi{% endif %}" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="{% if user %}{% if user.first_name or user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %}{% if user.professional_title %} — {{ user.professional_title }}{% endif %}{% else %}Khasanoff.uz{% endif %}" />
+    <meta name="twitter:title" content="{% if user and user.last_name %}{{ user.last_name }} - Backend Programer{% elif user %}{{ user.username }} - Backend Programer{% else %}Khasanoff - Backend Programer{% endif %}" />
     <meta name="twitter:description" content="{% if user %}{% if user.professional_title %}{{ user.professional_title }}. {% endif %}Backend dasturchi portfoliyasi.{% else %}Backend dasturchi portfoliyasi{% endif %}" />
     <meta name="twitter:image" content="https://khasanoff.uz{% static 'og-preview.png' %}" />
     <script type="application/ld+json">
