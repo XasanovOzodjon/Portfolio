@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uz">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -12,52 +12,40 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E💻%3C/text%3E%3C/svg%3E">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E💻%3C/text%3E%3C/svg%3E">
-    
-    <title>
-      {% if user and user.username %}
-        {{ user.username }} - Backend Developer
-      {% else %}
-        Portfolio - Backend Developer
-      {% endif %}
-    </title>
-    <meta name="description" content="A professional portfolio template tailored for backend developers. Highlight your system architecture skills, API development, database expertise, and server-side projects with a clean and efficient design focused on technical excellence."/>
-    <meta name="author" content="DevPortfolioTemplates" />
-    <meta name="keywords" content="backend developer portfolio,server-side developer,API developer portfolio,system architect portfolio,database developer,backend engineer,cloud developer portfolio,backend development,DevOps portfolio,microservices portfolio,server architecture,backend showcase"/>
-    <meta name="creator" content="DevPortfolioTemplates" />
-    <meta name="publisher" content="DevPortfolioTemplates" />
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon" sizes="32x32" />
+    <link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}" sizes="180x180" />
+
+    <title>{% if user %}{% if user.first_name or user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %}{% if user.professional_title %} — {{ user.professional_title }}{% endif %}{% else %}Khasanoff.uz{% endif %}</title>
+    <meta name="description" content="{% if user %}{% if user.professional_title %}{{ user.professional_title }}. {% endif %}{% if user.first_name or user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %} — backend dasturchi portfoliyasi.{% if skills %} Ko'nikmalar: {% for skill in skills %}{{ skill.name }}{% if not forloop.last %}, {% endif %}{% endfor %}.{% endif %}{% else %}Khasanoff.uz — backend dasturchi portfoliyasi{% endif %}" />
+    <meta name="author" content="{% if user %}{% if user.first_name or user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %}{% else %}Khasanoff{% endif %}" />
+    <meta name="keywords" content="{% if user %}{{ user.username }}, {% endif %}backend developer, Python, Django, API development, portfolio, khasanoff.uz, Xasanov Ozodjon, Backend dasturchi, Ozodjon, Ozodjon Portfolio, Ozodjon Xasanov, Ozodjon KhasanOFF, Python dasturchi, Arduino robototexnik ustoz, Python Backend dasturchi, Python Django dasturchi" />
     <meta name="robots" content="index, follow" />
-    <meta name="googlebot" content="index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1"/>
-    <link rel="canonical" href="https://devportfoliotemplates.com/portfolio-templates/backend-developer"/>
+    <meta name="googlebot" content="index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1" />
+    <link rel="canonical" href="https://khasanoff.uz/" />
     <meta name="format-detection" content="telephone=no, email=no" />
-    <meta property="og:title" content="Backend Developer Portfolio Template" />
-    <meta property="og:description" content="A professional portfolio template tailored for backend developers. Showcase your system architecture skills and server-side expertise."/>
-    <meta property="og:url" content="https://devportfoliotemplates.com/portfolio-templates/backend-developer"/>
-    <meta property="og:site_name" content="DevPortfolioTemplates" />
-    <meta property="og:locale" content="en_US" />
-    <meta property="og:image" content="https://devportfoliotemplates.com/portfolio-previews/backend-developer-portfolio-template.png"/>
+    <meta property="og:title" content="{% if user %}{% if user.first_name or user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %}{% if user.professional_title %} — {{ user.professional_title }}{% endif %}{% else %}Khasanoff.uz{% endif %}" />
+    <meta property="og:description" content="{% if user %}{% if user.professional_title %}{{ user.professional_title }}. {% endif %}Backend dasturchi portfoliyasi — loyihalar, ko'nikmalar va aloqa.{% else %}Backend dasturchi portfoliyasi{% endif %}" />
+    <meta property="og:url" content="https://khasanoff.uz/" />
+    <meta property="og:site_name" content="khasanoff.uz" />
+    <meta property="og:locale" content="uz_UZ" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://khasanoff.uz{% static 'og-preview.png' %}" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Backend Developer Portfolio Template Preview"/>
-    <meta property="og:type" content="website" />
+    <meta property="og:image:alt" content="{% if user %}{% if user.first_name or user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %} — backend dasturchi portfoliyasi{% else %}Khasanoff.uz portfoliyasi{% endif %}" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@devportfoliotemplates" />
-    <meta name="twitter:creator" content="@devportfoliotemplates" />
-    <meta name="twitter:title" content="Backend Developer Portfolio Template" />
-    <meta name="twitter:description" content="A professional portfolio template tailored for backend developers. Showcase your system architecture skills and server-side expertise."/>
-    <meta name="twitter:image" content="https://devportfoliotemplates.com/portfolio-previews/backend-developer-portfolio-template.png"/>
-    <meta name="twitter:image:width" content="1200" />
-    <meta name="twitter:image:height" content="630" />
-    <meta name="twitter:image:alt" content="Backend Developer Portfolio Template Preview"/>
-    <link rel="icon" href="/favicon.ico" type="image/x-icon" sizes="16x16" />
+    <meta name="twitter:title" content="{% if user %}{% if user.first_name or user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %}{% if user.professional_title %} — {{ user.professional_title }}{% endif %}{% else %}Khasanoff.uz{% endif %}" />
+    <meta name="twitter:description" content="{% if user %}{% if user.professional_title %}{{ user.professional_title }}. {% endif %}Backend dasturchi portfoliyasi.{% else %}Backend dasturchi portfoliyasi{% endif %}" />
+    <meta name="twitter:image" content="https://khasanoff.uz{% static 'og-preview.png' %}" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "WebSite",
-        "name": "Developer Portfolio Templates",
-        "description": "Create a professional developer portfolio with our templates",
-        "url": "https://devportfoliotemplates.com"
+        "@type": "Person",
+        "name": "{% if user %}{% if user.first_name or user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %}{% else %}Khasanoff{% endif %}",
+        "url": "https://khasanoff.uz/",
+        {% if user and user.professional_title %}"jobTitle": "{{ user.professional_title }}",{% endif %}
+        "description": "Backend dasturchi portfoliyasi"
       }
     </script>
     <script src="{% static '_next/static/chunks/webpack-acf1cd904769b175.js' %}" async></script>

@@ -3,7 +3,7 @@
 touch .env
 cat > .env <<'ENV'
 SECRET_KEY=Ozodjon2007
-ALOWED_HOSTS=localhost,127.0.1,khasanov.uz,www.khasanov.uz
+ALLOWED_HOSTS=localhost,127.0.1,khasanoff.uz,www.khasanoff.uz
 
 # Database configuration
 POSTGRES_DB=portfolio
