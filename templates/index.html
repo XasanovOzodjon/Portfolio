@@ -16,7 +16,7 @@
     <link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}" sizes="180x180" />
 
-    <title>{% if user %}{% if user.first_name or user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %}{% if user.professional_title %} — {{ user.professional_title }}{% endif %}{% else %}Khasanoff.uz{% endif %}</title>
+    <title>{% if user and user.last_name %}{{ user.last_name }} - Backend Programer{% elif user %}{{ user.username }} - Backend Programer{% else %}Khasanoff - Backend Programer{% endif %}</title>
     <meta name="description" content="{% if user %}{% if user.professional_title %}{{ user.professional_title }}. {% endif %}{% if user.first_name or user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %} — backend dasturchi portfoliyasi.{% if skills %} Ko'nikmalar: {% for skill in skills %}{{ skill.name }}{% if not forloop.last %}, {% endif %}{% endfor %}.{% endif %}{% else %}Khasanoff.uz — backend dasturchi portfoliyasi{% endif %}" />
     <meta name="author" content="{% if user %}{% if user.first_name or user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %}{% else %}Khasanoff{% endif %}" />
     <meta name="keywords" content="{% if user %}{{ user.username }}, {% endif %}backend developer, Python, Django, API development, portfolio, khasanoff.uz, Xasanov Ozodjon, Backend dasturchi, Ozodjon, Ozodjon Portfolio, Ozodjon Xasanov, Ozodjon KhasanOFF, Python dasturchi, Arduino robototexnik ustoz, Python Backend dasturchi, Python Django dasturchi" />
