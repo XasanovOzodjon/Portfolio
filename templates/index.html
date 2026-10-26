@@ -1,358 +1,2019 @@
-{% load static %}
 <!DOCTYPE html>
-<html lang="uz">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Favicon -->
-    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon" sizes="32x32" />
-    <link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="{% static 'apple-touch-icon.png' %}" sizes="180x180" />
-
-    <title>{% if user and user.last_name %}{{ user.last_name }} - Backend Programer{% elif user %}{{ user.username }} - Backend Programer{% else %}Khasanoff - Backend Programer{% endif %}</title>
-    <meta name="description" content="{% if user %}{% if user.professional_title %}{{ user.professional_title }}. {% endif %}{% if user.first_name or user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %} — backend dasturchi portfoliyasi.{% if skills %} Ko'nikmalar: {% for skill in skills %}{{ skill.name }}{% if not forloop.last %}, {% endif %}{% endfor %}.{% endif %}{% else %}Khasanoff.uz — backend dasturchi portfoliyasi{% endif %}" />
-    <meta name="author" content="{% if user %}{% if user.first_name or user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %}{% else %}Khasanoff{% endif %}" />
-    <meta name="keywords" content="{% if user %}{{ user.username }}, {% endif %}backend developer, Python, Django, API development, portfolio, khasanoff.uz, Xasanov Ozodjon, Backend dasturchi, Ozodjon, Ozodjon Portfolio, Ozodjon Xasanov, Ozodjon KhasanOFF, Python dasturchi, Arduino robototexnik ustoz, Python Backend dasturchi, Python Django dasturchi" />
-    <meta name="robots" content="index, follow" />
-    <meta name="googlebot" content="index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1" />
-    <link rel="canonical" href="https://khasanoff.uz/" />
-    <meta name="format-detection" content="telephone=no, email=no" />
-    <meta property="og:title" content="{% if user and user.last_name %}{{ user.last_name }} - Backend Programer{% elif user %}{{ user.username }} - Backend Programer{% else %}Khasanoff - Backend Programer{% endif %}" />
-    <meta property="og:description" content="{% if user %}{% if user.professional_title %}{{ user.professional_title }}. {% endif %}Backend dasturchi portfoliyasi — loyihalar, ko'nikmalar va aloqa.{% else %}Backend dasturchi portfoliyasi{% endif %}" />
-    <meta property="og:url" content="https://khasanoff.uz/" />
-    <meta property="og:site_name" content="khasanoff.uz" />
-    <meta property="og:locale" content="uz_UZ" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://khasanoff.uz{% static 'og-preview.png' %}" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="{% if user %}{% if user.first_name or user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %} — backend dasturchi portfoliyasi{% else %}Khasanoff.uz portfoliyasi{% endif %}" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="{% if user and user.last_name %}{{ user.last_name }} - Backend Programer{% elif user %}{{ user.username }} - Backend Programer{% else %}Khasanoff - Backend Programer{% endif %}" />
-    <meta name="twitter:description" content="{% if user %}{% if user.professional_title %}{{ user.professional_title }}. {% endif %}Backend dasturchi portfoliyasi.{% else %}Backend dasturchi portfoliyasi{% endif %}" />
-    <meta name="twitter:image" content="https://khasanoff.uz{% static 'og-preview.png' %}" />
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "Person",
-        "name": "{% if user %}{% if user.first_name or user.last_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %}{% else %}Khasanoff{% endif %}",
-        "url": "https://khasanoff.uz/",
-        {% if user and user.professional_title %}"jobTitle": "{{ user.professional_title }}",{% endif %}
-        "description": "Backend dasturchi portfoliyasi"
-      }
-    </script>
-    <script src="{% static '_next/static/chunks/webpack-acf1cd904769b175.js' %}" async></script>
-  </head>
-  <body class="antialiased bg-gray-900 text-white">
-    <style>
-      body {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        background: #1a1a1a;
-        color: white;
-      }
-      .terminal-card {
-        background: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(16px);
-        border: 1px solid rgba(75, 85, 99, 0.3);
-        border-radius: 12px;
-        animation: fadeInUp 0.6s ease-out forwards;
-        opacity: 1;
-        transform: translateY(0);
-      }
-      .section-card {
-        background: rgba(17, 24, 39, 0.5);
-        backdrop-filter: blur(8px);
-        border: 1px solid rgba(75, 85, 99, 0.2);
-        border-radius: 16px;
-        animation: fadeInUp 0.8s ease-out forwards;
-        opacity: 1;
-        transform: translateY(0);
-      }
-      .achievement-card {
-        background: rgba(31, 41, 55, 0.5);
-        border: 1px solid rgba(75, 85, 99, 0.2);
-        border-radius: 8px;
-        opacity: 1;
-        transform: scale(1);
-        transition: all 0.3s ease;
-      }
-      .achievement-card:hover {
-        transform: scale(1.02);
-        background: rgba(31, 41, 55, 0.7);
-      }
-      @keyframes fadeInUp {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
+<html lang="{{ current_lang|default:'uz' }}" class="scroll-smooth">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>{% if user %}{{ user.first_name }} {{ user.last_name }} — {{ user.professional_title }}{% else %}Ozodjon Xasanov — Backend Developer & Architect{% endif %}</title>
+  <meta name="description" content="Portfolio of {% if user %}{{ user.first_name }} {{ user.last_name }}{% else %}Ozodjon Xasanov{% endif %}, a backend developer and system architect specializing in Python, Django, REST APIs, and high-performance digital systems.">
+  
+  <!-- Tailwind CSS v3 with Plugins -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              black: '#0D0D0D',
+              dark: '#141414',
+              gray: '#7A7A7A',
+              light: '#F8F9FA',
+              border: '#E5E5E5'
+            }
+          }
         }
       }
-      .skill-tag {
-        background: rgba(34, 197, 94, 0.1);
-        border: 1px solid rgba(34, 197, 94, 0.2);
-        color: #22c55e;
-        padding: 4px 12px;
-        border-radius: 6px;
-        font-size: 14px;
+    }
+  </script>
+
+  <!-- Performance Preconnect & DNS-Prefetch -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+
+  <!-- Asynchronous Non-Render-Blocking Font Loading with font-display: swap -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"></noscript>
+  <link rel="stylesheet" href="FlexCarousel.css">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #FAFAFA;
+      color: #121212;
+      overflow-x: clip;
+      selection-background-color: #000;
+      selection-color: #fff;
+    }
+
+    ::selection {
+      background: #000;
+      color: #fff;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* ============================================================
+       EXPERIENCE HORIZONTAL SPATIAL CANVAS
+       ============================================================ */
+    #exp-horizontal-stage {
+      will-change: transform;
+      transform: translate3d(0, 0, 0);
+    }
+    .exp-panel {
+      will-change: transform, opacity;
+    }
+    .exp-date-bg {
+      will-change: transform;
+    }
+    @keyframes expLivingFlow {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    .exp-living-flow {
+      animation: expLivingFlow 4.5s ease-in-out infinite;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #experience {
+        height: auto !important;
       }
-      .tech-tag {
-        background: rgba(59, 130, 246, 0.1);
-        border: 1px solid rgba(59, 130, 246, 0.2);
-        color: #3b82f6;
-        padding: 4px 12px;
-        border-radius: 9999px;
-        font-size: 12px;
+      #exp-sticky-viewport {
+        position: relative !important;
+        height: auto !important;
+        overflow: visible !important;
       }
-      .contact-section {
-        background: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(16px);
-        border: 1px solid rgba(75, 85, 99, 0.3);
-        border-radius: 16px;
-        opacity: 1;
+      #exp-horizontal-stage {
+        flex-direction: column !important;
+        width: 100% !important;
+        transform: none !important;
       }
-    </style>
-    <div class="antialiased">
-      <main class="min-h-screen bg-[#1A1A1A] text-white overflow-x-hidden">
-        
-        <!-- Hero Section -->
-        <section class="relative min-h-screen flex items-center justify-center overflow-hidden">
-          <div class="absolute inset-0 bg-gradient-to-r from-green-600/20 to-blue-600/20 opacity-10"></div>
-          <div class="absolute inset-0">
-            <div class="absolute inset-0 bg-[url('{% static 'grid.svg' %}')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
-          </div>
-          <div class="relative z-10 max-w-4xl w-full mx-4">
-            <div class="bg-black/50 backdrop-blur-lg rounded-lg border border-gray-800 p-6" style="opacity: 1; transform: translateY(0)">
-              <div class="flex items-center gap-2 mb-4">
-                <div class="w-3 h-3 rounded-full bg-red-500"></div>
-                <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-                <div class="w-3 h-3 rounded-full bg-green-500"></div>
-              </div>
-              <div class="font-mono">
-                <p class="text-green-500">$ whoami</p>
-                <h1 class="text-4xl md:text-5xl font-bold mt-2 mb-4">
-                  {% if user %}
-                    {{ user.last_name }} {{ user.first_name }}
-                  {% else %}
-                    Set your name in admin panel
-                  {% endif %}
-                </h1>
-                <p class="text-gray-400 mb-2">
-                  {% if user and user.professional_title %}
-                    {{ user.professional_title }}
-                  {% else %}
-                    Set your professional title in admin panel
-                  {% endif %}
-                </p>
-                <p class="text-green-500">$ skills</p>
-                <div class="flex flex-wrap gap-2 mt-2">
-                  {% if skills %}
-                    {% for skill in skills %}
-                      <span class="px-3 py-1 bg-green-500/10 rounded-md border border-green-500/20">{{ skill.name }}</span>
-                    {% endfor %}
-                  {% else %}
-                    <span class="px-3 py-1 bg-green-500/10 rounded-md border border-green-500/20">No skills added yet</span>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+      .exp-panel {
+        width: 100% !important;
+        padding-top: 5rem !important;
+        padding-bottom: 5rem !important;
+      }
+      .exp-living-flow {
+        animation: none !important;
+      }
+    }
 
-        <!-- Projects Section -->
-        <section class="py-20 px-4">
-          <div class="max-w-6xl mx-auto">
-            <h2 class="text-3xl font-bold mb-12 text-center">System Architecture & Projects</h2>
-            <div class="grid grid-cols-1 gap-8">
-              {% if projects %}
-                {% for project in projects %}
-                  <div class="bg-gray-900/50 rounded-xl p-6 backdrop-blur-sm border border-gray-800 hover:border-gray-700 transition-colors">
-                    {% if project.link %}
-                      <a href="{{ project.link }}" target="_blank" class="block">
-                    {% endif %}
-                    <h3 class="text-2xl font-bold mb-4">{{ project.title }}</h3>
-                    <p class="text-gray-400 mb-6">{{ project.description }}</p>
-                    {% if project.key_achievements_list %}
-                      <div class="mb-6">
-                        <h4 class="text-lg font-semibold mb-2">Key Achievements:</h4>
-                        <ul class="list-disc list-inside space-y-2 text-gray-300">
-                          {% for achievement in project.key_achievements_list %}
-                            <li>{{ achievement.title }}</li>
-                          {% endfor %}
-                        </ul>
-                      </div>
-                    {% endif %}
-                    <div class="flex flex-wrap gap-2">
-                      {% if project.skills.all %}
-                        {% for skill in project.skills.all %}
-                          <span class="text-sm px-3 py-1 bg-blue-500/10 rounded-full border border-blue-500/20">{{ skill.name }}</span>
-                        {% endfor %}
-                      {% endif %}
-                    </div>
-                    {% if project.link %}
-                      </a>
-                    {% endif %}
-                  </div>
-                {% endfor %}
-              {% else %}
-                <div class="bg-gray-900/50 rounded-xl p-6 backdrop-blur-sm border border-gray-800">
-                  <h3 class="text-2xl font-bold mb-4">No projects added yet</h3>
-                  <p class="text-gray-400">Add projects in the admin panel to showcase your work.</p>
-                </div>
-              {% endif %}
-            </div>
-          </div>
-        </section>
+    #project-modal {
+      transition: opacity 380ms cubic-bezier(0.16, 1, 0.3, 1), backdrop-filter 380ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #project-modal-card {
+      transition: transform 440ms cubic-bezier(0.16, 1, 0.3, 1), opacity 360ms cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: transform, opacity;
+      transform: translate3d(0, 0, 0);
+    }
 
-        <!-- Impact & Achievements Section -->
-        {% if MaA %}
-        <section class="py-20 px-4 bg-gray-900/50">
-          <div class="max-w-6xl mx-auto">
-            <h2 class="text-3xl font-bold mb-12 text-center">Impact & Achievements</h2>
-            <div class="grid grid-cols-1 gap-12">
-              {% for item in MaA %}
-                <div>
-                  <h3 class="text-xl font-semibold mb-6 text-green-400">{{ item.title }}</h3>
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {% for achievement in item.achievements %}
-                      <div class="bg-gray-800/50 rounded-lg p-6 border border-gray-700 achievement-card">
-                        <h4 class="text-lg font-semibold text-gray-300">{{ achievement.title }}</h4>
-                        <ul class="mt-2 space-y-2 text-gray-400">
-                          {% for aa in achievement.items %}
-                            <li>• {{ aa.title }}</li>
-                          {% endfor %}
-                        </ul>
-                      </div>
-                    {% endfor %}
-                  </div>
-                </div>
-              {% endfor %}
-            </div>
-          </div>
-        </section>
-        {% endif %}
+    /* ============================================================
+       EDITORIAL HERO TITLE
+       ============================================================ */
+    /* Metallic gradient for lower text ("PORTFOLIO") only */
+    .metallic-title {
+      display: inline-block;
+      background: linear-gradient(180deg, #1A1A1A 0%, #4A4A4A 35%, #8E8E8E 60%, #BDBDBD 85%, #E5E5E5 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-        <!-- Contact Section -->
-        <section class="py-20 px-4">
-          <div class="max-w-4xl mx-auto">
-            <div class="relative p-8 rounded-2xl overflow-hidden backdrop-blur-lg border border-gray-800 bg-black/50">
-              <div class="absolute inset-0 bg-gradient-to-r from-green-500/5 to-blue-500/5"></div>
-              <div class="relative z-10">
-                <div class="flex items-center gap-2 mb-6">
-                  <div class="w-3 h-3 rounded-full bg-red-500"></div>
-                  <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-                  <div class="w-3 h-3 rounded-full bg-green-500"></div>
-                </div>
-                <div class="font-mono">
-                  {% if messages %}
-                    {% for message in messages %}
-                      <div class="mb-6 p-4 {% if message.tags == 'success' %}bg-green-500/10 border border-green-500/20{% else %}bg-red-500/10 border border-red-500/20{% endif %} rounded-lg">
-                        <p class="{% if message.tags == 'success' %}text-green-500{% else %}text-red-500{% endif %} font-mono">$ message-status --{{ message.tags }}</p>
-                        <p class="{% if message.tags == 'success' %}text-green-400{% else %}text-red-400{% endif %} mt-2">{% if message.tags == 'success' %}✅{% else %}❌{% endif %} {{ message }}</p>
-                        <p class="text-gray-400 text-sm mt-2 font-mono">Process completed with exit code {% if message.tags == 'success' %}200{% else %}422{% endif %}</p>
-                      </div>
-                    {% endfor %}
-                  {% endif %}
-                  
-                  <p class="text-green-500 mb-2">$ contact --info</p>
-                  <h2 class="text-3xl font-bold mb-8 text-gray-200">Let's Connect</h2>
-                  
-                  {% if user.adress %}
-                  <p class="text-green-500 mb-2">$ location --current</p>
-                  <div class="flex items-center gap-2 text-gray-300 mb-6">
-                    <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    </svg>
-                    <span>{{ user.adress }}</span>
-                  </div>
-                  {% endif %}
-                  
-                  {% if user.email %}
-                  <p class="text-green-500 mb-2">$ contact --email</p>
-                  <a href="mailto:{{ user.email }}" class="inline-block px-6 py-3 mb-6 bg-green-500/10 text-green-400 rounded-lg border border-green-500/20 hover:bg-green-500/20 transition-colors">{{ user.email }}</a>
-                  {% endif %}
-                  
-                  <p class="text-green-500 mb-4">$ ls ./social-links</p>
-                  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-                    {% if user.github_username %}
-                    <a href="https://github.com/{{ user.github_username }}" target="_blank" class="flex items-center gap-3 px-4 py-3 bg-gray-800/50 rounded-lg hover:bg-gray-700/50 transition-colors border border-gray-700/50 group">
-                      <div class="p-2 bg-gray-700/50 rounded-lg group-hover:bg-gray-600/50 transition-colors">
-                        <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.30.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path>
-                        </svg>
-                      </div>
-                      <div>
-                        <p class="font-semibold text-gray-200">GitHub</p>
-                        <p class="text-sm text-gray-400">@{{ user.github_username }}</p>
-                      </div>
-                    </a>
-                    {% endif %}
-                    
-                    {% if user.instagram_username %}
-                    <a href="https://www.instagram.com/{{ user.instagram_username }}/" target="_blank" class="flex items-center gap-3 px-4 py-3 bg-gray-800/50 rounded-lg hover:bg-gray-700/50 transition-colors border border-gray-700/50 group">
-                      <div class="p-2 bg-gray-700/50 rounded-lg group-hover:bg-gray-600/50 transition-colors">
-                        <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                        </svg>
-                      </div>
-                      <div>
-                        <p class="font-semibold text-gray-200">Instagram</p>
-                        <p class="text-sm text-gray-400">@{{ user.instagram_username }}</p>
-                      </div>
-                    </a>
-                    {% endif %}
+    /* Portrait gradient mask so bottom of person fades cleanly into background */
+    .hero-portrait-mask {
+      mask-image: linear-gradient(black 65%, transparent 100%);
+      -webkit-mask-image: linear-gradient(black 65%, transparent 100%);
+    }
 
-                    {% if user.telegram_username %}
-                    <a href="https://t.me/{{ user.telegram_username }}" target="_blank" class="flex items-center gap-3 px-4 py-3 bg-gray-800/50 rounded-lg hover:bg-gray-700/50 transition-colors border border-gray-700/50 group">
-                      <div class="p-2 bg-gray-700/50 rounded-lg group-hover:bg-gray-600/50 transition-colors">
-                        <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
-                        </svg>
-                      </div>
-                      <div>
-                        <p class="font-semibold text-gray-200">Telegram</p>
-                        <p class="text-sm text-gray-400">@{{ user.telegram_username }}</p>
-                      </div>
-                    </a>
-                    {% endif %}
-                  </div>
-                  
-                  <p class="text-green-500 mb-4">$ send-message</p>
-                  <form action="" method="post" class="space-y-4">
-                    {% csrf_token %}
-                    <div>
-                      <label for="name" class="block text-sm font-mono text-green-500 mb-2">$ name:</label>
-                      <input type="text" id="name" name="name" required class="w-full px-3 py-2 font-mono bg-black/20 border border-green-500/20 rounded-md text-gray-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-colors" placeholder="Your name" />
-                    </div>
-                    <div>
-                      <label for="email" class="block text-sm font-mono text-green-500 mb-2">$ email:</label>
-                      <input type="email" name="email" id="email" required class="w-full px-3 py-2 font-mono bg-black/20 border border-green-500/20 rounded-md text-gray-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-colors" placeholder="your@email.com" />
-                    </div>
-                    <div>
-                      <label for="message" class="block text-sm font-mono text-green-500 mb-2">$ message:</label>
-                      <textarea id="message" name="message" required rows="4" class="w-full px-3 py-2 font-mono bg-black/20 border border-green-500/20 rounded-md text-gray-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-colors resize-none" placeholder="Your message..."></textarea>
-                    </div>
-                    <button type="submit" class="w-full px-6 py-3 font-mono text-white font-medium bg-green-500 hover:bg-green-600 rounded-lg transition-colors">
-                      SendMessage()
-                    </button>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+    .footer-metallic-title {
+      background: linear-gradient(180deg, #FFFFFF 0%, #a8a8a8 50%, #444444 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      transition: filter 0.3s ease;
+    }
+    .footer-metallic-title:hover {
+      filter: brightness(1.2);
+    }
 
-      </main>
+    .letter-spacing-widest {
+      letter-spacing: 0.18em;
+    }
+
+    .pill-btn {
+      border: 1px solid #D6D6D6;
+      border-radius: 9999px;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .pill-btn:hover {
+      border-color: #000000;
+      transform: translateY(-1px);
+    }
+
+    .circle-btn {
+      border: 1px solid #D1D1D1;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, background-color 0.25s ease;
+    }
+    .circle-btn:hover {
+      border-color: #000;
+      transform: scale(1.08);
+      background-color: #f0f0f0;
+    }
+
+    /* Hero portrait mask */
+    .hero-portrait-mask {
+      mask-image: linear-gradient(to bottom, black 65%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, black 65%, transparent 100%);
+    }
+
+    /* Accordion transition styles */
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, margin 0.3s ease;
+      opacity: 0;
+    }
+    .accordion-item.active .accordion-content {
+      max-height: 250px;
+      opacity: 1;
+      margin-top: 1rem;
+    }
+
+    /* Toast animation */
+    .toast-enter {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    .toast-active {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body class="antialiased text-[#111] bg-[#FAFAFA]">
+
+  <!-- ============================================================
+       CINEMATIC EYE PRELOADER (Sharingan ➔ Rinnegan Animation)
+       ============================================================ -->
+  <div
+    id="site-preloader"
+    class="fixed inset-0 z-[99999] bg-[#000000] flex flex-col items-center justify-center overflow-hidden select-none"
+    aria-label="Loading"
+  >
+    <!-- Soft Center Dimensional Flare (Active only during the exit transition) -->
+    <div
+      id="preloader-portal-flare"
+      class="absolute inset-0 pointer-events-none opacity-0"
+      style="background: radial-gradient(circle at center, rgba(168,85,247,0.45) 0%, rgba(255,255,255,0.18) 25%, transparent 65%); transform: scale(0.6);"
+    ></div>
+
+    <!-- Center Eye Stage: Seamless feathered container in pure pitch-black void -->
+    <div id="preloader-stage" class="relative z-10 w-full max-w-[700px] px-4 flex flex-col items-center justify-center">
+      <div
+        class="relative w-full aspect-[2/1] flex items-center justify-center overflow-hidden"
+        style="mask-image: radial-gradient(ellipse 92% 85% at 50% 50%, #000000 65%, transparent 100%); -webkit-mask-image: radial-gradient(ellipse 92% 85% at 50% 50%, #000000 65%, transparent 100%);"
+      >
+        <video
+          id="preloader-video"
+          class="w-full h-full object-contain pointer-events-none"
+          style="mix-blend-mode: screen;"
+          autoplay
+          muted
+          playsinline
+          webkit-playsinline
+          preload="auto"
+        >
+          <source src="assets/loader_eyes.webm" type="video/webm">
+          <source src="assets/loader_eyes.mp4" type="video/mp4">
+        </video>
+      </div>
+
+      <!-- Subtle, elegant Skip button -->
+      <button
+        id="preloader-skip-btn"
+        type="button"
+        class="mt-4 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.03] text-[10px] font-semibold tracking-[0.2em] uppercase text-neutral-400 hover:text-white hover:border-white/30 transition-all opacity-0 cursor-pointer pointer-events-auto"
+        onclick="event.stopPropagation(); dismissPreloader();"
+      >
+        SKIP ↗
+      </button>
     </div>
-  </body>
+  </div>
+
+  <script>
+    (function() {
+      const preloader = document.getElementById('site-preloader');
+      const video = document.getElementById('preloader-video');
+      const skipBtn = document.getElementById('preloader-skip-btn');
+      const flare = document.getElementById('preloader-portal-flare');
+      let pageWrapper = null;
+      let dismissed = false;
+      let transitionStarted = false;
+
+      // Lock body scroll while preloader is active
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+
+      const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function getPageWrapper() {
+        if (!pageWrapper) {
+          pageWrapper = document.getElementById('page-wrapper');
+        }
+        return pageWrapper;
+      }
+
+      function initPageWrapperStyle() {
+        const pw = getPageWrapper();
+        if (pw && !prefersReducedMotion) {
+          pw.style.transform = 'scale(0.96)';
+          pw.style.filter = 'blur(8px)';
+          pw.style.opacity = '0.5';
+        }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initPageWrapperStyle);
+      } else {
+        initPageWrapperStyle();
+      }
+
+      function executeCinematicTransition() {
+        if (transitionStarted) return;
+        transitionStarted = true;
+
+        const pw = getPageWrapper();
+
+        if (prefersReducedMotion) {
+          if (preloader) {
+            preloader.style.transition = 'opacity 0.4s ease';
+            preloader.style.opacity = '0';
+          }
+          if (pw) {
+            pw.style.transform = '';
+            pw.style.filter = '';
+            pw.style.opacity = '';
+          }
+          setTimeout(cleanup, 400);
+          return;
+        }
+
+        // Stage 1 (0ms): Dimensional portal flare & Welcome glow defocus
+        if (flare) {
+          flare.style.transition = 'opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
+          flare.style.opacity = '1';
+          flare.style.transform = 'scale(1.5)';
+        }
+
+        if (video) {
+          video.style.transition = 'transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease';
+          video.style.transform = 'scale(1.22)';
+          video.style.filter = 'blur(16px) brightness(1.8)';
+          video.style.opacity = '0';
+        }
+
+        if (skipBtn) {
+          skipBtn.style.transition = 'opacity 0.25s ease';
+          skipBtn.style.opacity = '0';
+        }
+
+        // Stage 2 (160ms): Pure velvet fade + dimensional site zoom into crystal focus
+        setTimeout(() => {
+          if (preloader) {
+            preloader.style.transition = 'opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
+            preloader.style.opacity = '0';
+            preloader.style.transform = 'scale(1.05)';
+            preloader.style.pointerEvents = 'none';
+          }
+
+          if (pw) {
+            pw.style.transition = 'transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), filter 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.75s ease';
+            pw.style.transform = 'scale(1) translateY(0)';
+            pw.style.filter = 'blur(0px)';
+            pw.style.opacity = '1';
+          }
+        }, 160);
+
+        // Stage 3 (1000ms): Complete cleanup & unlock scroll
+        setTimeout(cleanup, 1000);
+      }
+
+      function cleanup() {
+        if (preloader) {
+          preloader.style.display = 'none';
+        }
+        document.documentElement.style.overflow = '';
+        document.body.style.overflow = '';
+        const pw = getPageWrapper();
+        if (pw) {
+          pw.style.transform = '';
+          pw.style.filter = '';
+          pw.style.opacity = '';
+          pw.style.transition = '';
+        }
+        window.dispatchEvent(new CustomEvent('preloaderFinished'));
+      }
+
+      function dismiss(immediate = false) {
+        if (dismissed) return;
+        dismissed = true;
+        executeCinematicTransition();
+      }
+      window.dismissPreloader = () => dismiss(true);
+
+      if (video) {
+        // Enforce 90% playback speed (0.9x)
+        const applySpeed = () => {
+          video.playbackRate = 0.9;
+          video.defaultPlaybackRate = 0.9;
+        };
+        applySpeed();
+        video.addEventListener('loadedmetadata', applySpeed);
+        video.addEventListener('play', applySpeed);
+
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            // Autoplay fallback: dismiss if blocked
+            setTimeout(() => dismiss(true), 2500);
+          });
+        }
+
+        // When video ends on Welcome, hold for 1.0 second as requested before transition
+        video.addEventListener('ended', () => {
+          if (!dismissed) {
+            setTimeout(() => {
+              dismiss(false);
+            }, 1000);
+          }
+        });
+      }
+
+      // Show skip button after 1.8 seconds
+      setTimeout(() => {
+        if (skipBtn && !dismissed && !transitionStarted) {
+          skipBtn.style.opacity = '1';
+        }
+      }, 1800);
+
+      // Safety timeout: 12s to allow full 90% playback + 1s Welcome hold + transition
+      setTimeout(() => {
+        if (!dismissed && !transitionStarted) {
+          dismiss(true);
+        }
+      }, 12000);
+
+      // Keyboard escape/space to skip
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') {
+          dismiss(true);
+        }
+      }, { once: true });
+    })();
+  </script>
+
+  <!-- Notification Toast Container -->
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- BEGIN: Page Content Wrapper (Animated on Preloader Reveal) -->
+  <div id="page-wrapper" class="w-full relative origin-top">
+
+  <!-- BEGIN: Navigation Header -->
+  <header class="relative z-40 bg-[#FAFAFA] transition-all duration-300 w-full pt-6 pb-4 px-6 md:px-14 max-w-[1400px] mx-auto flex items-center justify-between" data-purpose="site-navigation">
+    <!-- Brand Wordmark -->
+    <a class="group font-extrabold text-xl tracking-tight text-black flex items-center" href="#home">
+      <span>EGO</span>
+      <span class="inline-block w-2 h-2 bg-black rounded-full ml-1 transition-transform group-hover:scale-150 duration-200"></span>
+    </a>
+
+    <!-- Center Navigation Links (Pill with no unwanted wrapping) -->
+    <nav class="hidden md:flex items-center gap-1 p-1 bg-white/95 border border-[#E2E2E2] rounded-full shadow-sm text-xs font-semibold tracking-wider text-neutral-600">
+      <a id="nav-home" data-i18n="nav_home" class="nav-link px-4 py-2 rounded-full border border-neutral-300 text-black hover:border-black transition whitespace-nowrap" href="#home">HOME</a>
+      <a id="nav-about" data-i18n="nav_about" class="nav-link px-4 py-2 rounded-full border border-transparent hover:border-neutral-200 hover:text-black transition whitespace-nowrap" href="#about">ABOUT</a>
+      <a id="nav-experience" data-i18n="nav_experience" class="nav-link px-4 py-2 rounded-full border border-transparent hover:border-neutral-200 hover:text-black transition whitespace-nowrap" href="#experience">EXPERIENCE</a>
+      <a id="nav-projects" data-i18n="nav_projects" class="nav-link px-4 py-2 rounded-full border border-transparent hover:border-neutral-200 hover:text-black transition whitespace-nowrap" href="#projects">PROJECTS</a>
+      <a id="nav-mini-projects" data-i18n="nav_mini_projects" class="nav-link px-4 py-2 rounded-full border border-transparent hover:border-neutral-200 hover:text-black transition whitespace-nowrap" href="#mini-projects">MINI PROJECT</a>
+      <a id="nav-services" data-i18n="nav_services" class="nav-link px-4 py-2 rounded-full border border-transparent hover:border-neutral-200 hover:text-black transition whitespace-nowrap" href="#services">SERVICES</a>
+    </nav>
+
+    <!-- Right Social & Menu Links (Language Switcher, Telegram, GitHub, LinkedIn, Instagram) -->
+    <div class="flex items-center gap-1.5 md:gap-2 p-1.5 bg-white/95 border border-[#E2E2E2] rounded-full shadow-sm relative">
+      <!-- Language Switcher Pill (First in row) -->
+      <div class="relative" id="lang-switcher-wrapper">
+        <button 
+          id="lang-btn" 
+          onclick="toggleLangDropdown(event)" 
+          class="h-8 px-2.5 rounded-full flex items-center gap-1.5 hover:bg-neutral-100 transition-all text-neutral-800 hover:text-black font-semibold text-xs border border-neutral-200/80 bg-neutral-50/80 select-none cursor-pointer group" 
+          title="Select Language / Tilni tanlash"
+          aria-label="Language selection"
+        >
+          <span id="active-lang-flag" class="text-xs leading-none">{% if current_lang == 'uz' %}🇺🇿{% elif current_lang == 'ru' %}🇷🇺{% else %}🇬🇧{% endif %}</span>
+          <span id="active-lang-badge" class="font-extrabold text-[11px] tracking-wide uppercase text-neutral-900">{{ current_lang|default:'EN'|upper }}</span>
+          <svg id="lang-dropdown-arrow" class="w-2.5 h-2.5 text-neutral-400 group-hover:text-black transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </button>
+
+        <!-- Glassmorphic Language Dropdown -->
+        <div 
+          id="lang-dropdown-menu" 
+          class="hidden absolute top-full left-0 mt-2.5 w-44 bg-white/95 backdrop-blur-xl border border-neutral-200 rounded-2xl shadow-2xl p-1.5 z-50 transform origin-top-left transition-all duration-200"
+        >
+          <div data-i18n="dropdown_lang_title" class="px-2.5 py-1.5 text-[9px] font-bold tracking-widest uppercase text-neutral-400 border-b border-neutral-100 mb-1">
+            SELECT LANGUAGE
+          </div>
+          <button onclick="selectLang('en')" id="lang-opt-en" class="lang-opt w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-semibold text-neutral-800 hover:bg-neutral-100 transition">
+            <span class="flex items-center gap-2"><span>🇬🇧</span> English</span>
+            <span id="lang-check-en" class="text-xs font-bold text-black">✓</span>
+          </button>
+          <button onclick="selectLang('uz')" id="lang-opt-uz" class="lang-opt w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-semibold text-neutral-800 hover:bg-neutral-100 transition">
+            <span class="flex items-center gap-2"><span>🇺🇿</span> O'zbekcha</span>
+            <span id="lang-check-uz" class="text-xs font-bold text-black hidden">✓</span>
+          </button>
+          <button onclick="selectLang('ru')" id="lang-opt-ru" class="lang-opt w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-semibold text-neutral-800 hover:bg-neutral-100 transition">
+            <span class="flex items-center gap-2"><span>🇷🇺</span> Русский</span>
+            <span id="lang-check-ru" class="text-xs font-bold text-black hidden">✓</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Divider Hairline -->
+      <div class="w-px h-4 bg-neutral-200"></div>
+
+      <!-- Telegram -->
+      <a class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-neutral-100 transition text-neutral-700 hover:text-black" href="{{ social_links.telegram|default:'https://t.me/khasanoff' }}" target="_blank" rel="noopener" title="Telegram">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+        </svg>
+      </a>
+
+      <!-- GitHub -->
+      <a class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-neutral-100 transition text-neutral-700 hover:text-black" href="{{ social_links.github|default:'https://github.com/XasanovOzodjon' }}" target="_blank" rel="noopener" title="GitHub">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+        </svg>
+      </a>
+
+      <!-- LinkedIn -->
+      <a class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-neutral-100 transition text-neutral-700 hover:text-black" href="{{ social_links.linkedin|default:'https://linkedin.com/' }}" target="_blank" rel="noopener" title="LinkedIn">
+        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
+        </svg>
+      </a>
+
+      <!-- Instagram -->
+      <a class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-neutral-100 transition text-neutral-700 hover:text-black" href="{{ social_links.instagram|default:'https://instagram.com/' }}" target="_blank" rel="noopener" title="Instagram">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <rect height="18" rx="5" ry="5" width="18" x="3" y="3"></rect>
+          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+          <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line>
+        </svg>
+      </a>
+
+      <!-- Mobile Hamburger Button -->
+      <button id="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Open Menu" class="md:hidden w-8 h-8 rounded-full flex items-center justify-center hover:bg-neutral-100 transition text-neutral-700 ml-1">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="4" x2="20" y1="7" y2="7"></line><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="17" y2="17"></line></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Menu -->
+  <div id="mobile-drawer" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 flex justify-end">
+    <div id="mobile-drawer-content" class="w-4/5 max-w-sm bg-white h-full p-8 flex flex-col justify-between transform translate-x-full transition-transform duration-300 shadow-2xl">
+      <div>
+        <div class="flex items-center justify-between pb-6 border-b border-neutral-200">
+          <span class="font-extrabold text-lg tracking-tight">EGO•</span>
+          <button onclick="toggleMobileMenu()" class="w-8 h-8 rounded-full border border-neutral-300 flex items-center justify-center text-neutral-700 hover:border-black">
+            ✕
+          </button>
+        </div>
+        <nav class="flex flex-col gap-4 mt-8 text-base font-bold tracking-wider">
+          <a onclick="toggleMobileMenu()" data-i18n="nav_home" href="#home" class="py-2 border-b border-neutral-100 hover:text-neutral-500">HOME</a>
+          <a onclick="toggleMobileMenu()" data-i18n="nav_about" href="#about" class="py-2 border-b border-neutral-100 hover:text-neutral-500">ABOUT</a>
+          <a onclick="toggleMobileMenu()" data-i18n="nav_experience" href="#experience" class="py-2 border-b border-neutral-100 hover:text-neutral-500">EXPERIENCE</a>
+          <a onclick="toggleMobileMenu()" data-i18n="nav_projects" href="#projects" class="py-2 border-b border-neutral-100 hover:text-neutral-500">PROJECTS</a>
+          <a onclick="toggleMobileMenu()" data-i18n="nav_mini_projects" href="#mini-projects" class="py-2 border-b border-neutral-100 hover:text-neutral-500">MINI PROJECT</a>
+          <a onclick="toggleMobileMenu()" data-i18n="nav_services" href="#services" class="py-2 border-b border-neutral-100 hover:text-neutral-500">SERVICES</a>
+          <a onclick="toggleMobileMenu(); openContactModal();" data-i18n="nav_contact" href="javascript:void(0)" class="py-2 text-black hover:underline">CONTACT</a>
+        </nav>
+        <!-- Mobile Language Selector -->
+        <div class="mt-6 pt-4 border-t border-neutral-100 flex items-center justify-between">
+          <span class="text-[10px] font-bold tracking-widest uppercase text-neutral-400">Til / Language</span>
+          <div class="flex items-center gap-1 bg-neutral-100 p-1 rounded-full">
+            <button onclick="selectLang('uz')" class="mobile-lang-btn px-2.5 py-1 rounded-full text-xs font-bold text-neutral-800 transition" data-lang="uz">UZ</button>
+            <button onclick="selectLang('en')" class="mobile-lang-btn px-2.5 py-1 rounded-full text-xs font-bold text-neutral-800 transition" data-lang="en">EN</button>
+            <button onclick="selectLang('ru')" class="mobile-lang-btn px-2.5 py-1 rounded-full text-xs font-bold text-neutral-800 transition" data-lang="ru">RU</button>
+          </div>
+        </div>
+      </div>
+      <div class="pt-6 border-t border-neutral-200">
+        <p class="text-xs uppercase tracking-widest text-neutral-400 mb-3">{{ user.first_name|default:'OZODJON'|upper }} {{ user.last_name|default:'XASANOV'|upper }}</p>
+        <p class="text-xs text-neutral-600">{{ user.professional_title|default:'Editorial Developer & Backend Architect' }}</p>
+      </div>
+    </div>
+  </div>
+  <!-- END: Navigation -->
+
+  <!-- BEGIN: Hero Section -->
+  <main class="relative max-w-[1400px] mx-auto px-6 md:px-14 pt-6 md:pt-12 pb-20 overflow-hidden" data-purpose="hero-section" id="home">
+    <!-- Big Title Header -->
+    <div class="text-center w-full mb-6 md:mb-10 relative z-0 select-none">
+      <h1 id="hero-title" class="text-[9.5vw] md:text-[8rem] lg:text-[9.5rem] font-extrabold uppercase leading-[0.85] tracking-tight">
+        <span class="block">
+          <span class="text-[#121212]">{% if user and user.first_name %}{{ user.first_name|upper }}{% else %}OZODJON{% endif %}</span>
+        </span>
+        <span class="block">
+          <span class="metallic-title">{% if user and user.last_name %}{{ user.last_name|upper }}{% else %}XASANOV{% endif %}</span>
+        </span>
+      </h1>
+    </div>
+
+    <!-- Center Headshot & Symmetrical Content Grid -->
+    <div class="relative grid grid-cols-1 md:grid-cols-12 items-center mt-2 md:-mt-6">
+      
+      <!-- Left Column: Designer info & Arrow -->
+      <div class="md:col-span-3 flex flex-col items-start md:items-start pl-2 md:pl-6 order-2 md:order-1 pt-6 md:pt-0">
+        <span class="text-xs font-bold tracking-wider uppercase text-neutral-800 mb-6">BACKEND EST.2024</span>
+        <a class="circle-btn w-14 h-14 md:w-16 md:h-16 border-neutral-300" href="#about" aria-label="Scroll to About Section">
+          <svg class="w-5 h-5 text-neutral-800 transform rotate-45" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </a>
+      </div>
+
+      <!-- Center Column: Stylized Black and White Headshot (in front of text) -->
+      <div class="md:col-span-6 flex justify-center order-1 md:order-2 relative z-10 -mt-16 md:-mt-36">
+        <div class="relative w-[320px] h-[400px] md:w-[480px] md:h-[580px] flex items-end justify-center hero-portrait-mask">
+          <picture class="w-full h-full flex items-end justify-center">
+            <source srcset="assets/hero_portrait.webp?v=ozodjon" type="image/webp">
+            <source srcset="assets/hero_portrait.png?v=ozodjon" type="image/png">
+            <img src="assets/hero_portrait.webp?v=ozodjon" 
+                 alt="{% if user %}{{ user.first_name }} {{ user.last_name }}{% else %}Ozodjon Xasanov{% endif %} — Developer & Architect" 
+                 width="480" height="580"
+                 loading="eager"
+                 fetchpriority="high"
+                 decoding="sync"
+                 class="w-full h-full object-contain object-bottom pointer-events-none select-none transition-transform duration-700 hover:scale-[1.02]"
+                 onerror="this.src='assets/hero_portrait.png?v=ozodjon'">
+          </picture>
+        </div>
+      </div>
+
+      <!-- Right Column: Pitch and Disciplines -->
+      <div class="md:col-span-3 flex flex-col items-start md:items-end text-left order-3 pt-6 md:pt-0 pr-2 md:pr-6 space-y-10">
+        <!-- Pitch Quote -->
+        <p class="text-[11px] md:text-xs uppercase font-medium leading-relaxed tracking-wider text-neutral-700 max-w-[220px] text-left">
+          {% if user and user.bio %}{{ user.bio|truncatechars:100|upper }}{% else %}PASSIONATE ABOUT SCALABLE ARCHITECTURES, HIGH-PERFORMANCE APIS AND DISTRIBUTED SYSTEMS.{% endif %}
+        </p>
+
+        <!-- Service List with hover interaction -->
+        <div class="flex flex-col space-y-3 text-[11px] md:text-xs font-semibold tracking-widest text-neutral-600 uppercase">
+          {% for service in services|slice:":3" %}
+          <a href="#services" onclick="selectService({{ forloop.counter0 }})" class="hover:text-black hover:translate-x-1 md:hover:-translate-x-1 transition-all inline-flex items-center gap-1.5 {% if forloop.first %}font-bold text-black{% endif %}">
+            <span>{{ service.title|upper }}</span>
+          </a>
+          {% empty %}
+          <a href="#services" onclick="selectService(0)" class="hover:text-black hover:translate-x-1 md:hover:-translate-x-1 transition-all inline-flex items-center gap-1.5 font-bold text-black">
+            <span>UI/UX</span>
+          </a>
+          <a href="#services" onclick="selectService(1)" class="hover:text-black hover:translate-x-1 md:hover:-translate-x-1 transition-all inline-flex items-center gap-1.5">
+            <span>WEB DESIGN</span>
+          </a>
+          <a href="#services" onclick="selectService(2)" class="hover:text-black hover:translate-x-1 md:hover:-translate-x-1 transition-all inline-flex items-center gap-1.5">
+            <span>LANDING PAGE</span>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+  </main>
+  <!-- END: Hero Section -->
+
+  <!-- BEGIN: About Section (ScrollExpandMedia Component) -->
+  <section class="relative w-full bg-[#0D0D0D] text-white" id="about" style="min-height: 200vh;">
+    <div class="sticky top-0 w-full h-[100dvh] overflow-hidden flex flex-col items-center justify-start z-10">
+      <!-- Background Ambient with dynamic opacity: 1 - scrollProgress (Previous Starry Night Castle Background) -->
+      <div id="sem-bg-img" class="absolute inset-0 z-0 h-full w-full pointer-events-none transition-opacity duration-150 ease-out" style="will-change: opacity; transform: translateZ(0);">
+        <picture class="w-full h-full block">
+          <source srcset="assets/about_starry_castle_hq.webp?v=10" type="image/webp">
+          <source srcset="assets/about_starry_castle_hq.jpg?v=10" type="image/jpeg">
+          <img
+            src="assets/about_starry_castle_hq.webp?v=10"
+            alt="Monochrome Starry Night Castle Background"
+            width="2560" height="1180"
+            loading="lazy"
+            decoding="async"
+            class="w-full h-full object-cover object-center"
+          />
+        </picture>
+        <div class="absolute inset-0 bg-black/25"></div>
+      </div>
+
+      <!-- Centered Interactive Stage Container (Exact from React Component) -->
+      <div class="container mx-auto flex flex-col items-center justify-start relative z-10 w-full h-full">
+        <div class="flex flex-col items-center justify-center w-full h-[100dvh] relative">
+          
+          <!-- Expanding Media Card (Closed state: 300px x 400px, expands on scroll) -->
+          <div
+            id="sem-media-container"
+            class="absolute z-0 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-2xl overflow-hidden shadow-2xl transition-none bg-[#07090E]"
+            style="width: 300px; height: 400px; max-width: 95vw; max-height: 85vh; box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9); border: 1px solid rgba(255,255,255,0.35); will-change: width, height; backface-visibility: hidden;"
+          >
+            <!-- Media Image Container: fits 100% of the box without any letterboxing or cropping -->
+            <div class="relative w-full h-full overflow-hidden rounded-xl flex items-center justify-center bg-[#07090E]">
+              <!-- Crisp Base Image (GPU accelerated) -->
+              <picture class="w-full h-full block">
+                <source srcset="assets/about_floating_light_hq.webp?v=14" type="image/webp">
+                <source srcset="assets/about_floating_light_hq.png?v=14" type="image/png">
+                <img
+                  id="sem-media-img"
+                  src="assets/about_floating_light_hq.webp?v=14"
+                  alt="{{ user.first_name|default:'Ozodjon' }} {{ user.last_name|default:'Xasanov' }} - Ascendance &amp; Digital Craft"
+                  width="2048" height="1092"
+                  loading="lazy"
+                  decoding="async"
+                  class="w-full h-full object-cover rounded-xl transition-none"
+                  style="transform: scale(1.02) translateZ(0); transform-origin: center; backface-visibility: hidden;"
+                />
+              </picture>
+              <!-- Pre-blurred Layer for 120 FPS GPU-accelerated Unblur (fades out opacity smoothly on scroll) -->
+              <picture class="absolute inset-0 w-full h-full block pointer-events-none">
+                <source srcset="assets/about_floating_light_hq.webp?v=14" type="image/webp">
+                <source srcset="assets/about_floating_light_hq.png?v=14" type="image/png">
+                <img
+                  id="sem-media-blur"
+                  src="assets/about_floating_light_hq.webp?v=14"
+                  alt=""
+                  aria-hidden="true"
+                  width="2048" height="1092"
+                  loading="lazy"
+                  decoding="async"
+                  class="w-full h-full object-cover rounded-xl transition-none pointer-events-none"
+                  style="filter: blur(18px); transform: scale(1.08) translateZ(0); transform-origin: center; opacity: 1; will-change: opacity; backface-visibility: hidden;"
+                />
+              </picture>
+              <!-- Subtle Gradient Overlay: protects top/bottom legibility while keeping the center 100% transparent -->
+              <div id="sem-media-overlay" class="absolute inset-0 bg-gradient-to-b from-black/75 via-transparent to-black/85 rounded-xl transition-opacity duration-150 pointer-events-none"></div>
+
+              <!-- Minimal Aesthetic About Info - Perimeter Layout with Empty Center -->
+              <div
+                id="sem-media-content"
+                class="absolute inset-0 z-20 flex flex-col justify-between p-5 sm:p-7 md:p-9 pointer-events-none opacity-0 transition-all duration-300 select-none"
+              >
+                <!-- Top Perimeter: Refined Monochrome Headline -->
+                <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-white/10 pb-3">
+                  <h3 class="text-xs sm:text-sm md:text-base font-extrabold uppercase tracking-tight text-white max-w-xl">
+                    {{ user.about_tagline|default:'TURNING VISIONARY IDEAS INTO FAST, DISTINCTIVE DIGITAL EXPERIENCES'|upper }}
+                  </h3>
+                  <span class="text-[10px] font-mono tracking-wider uppercase text-neutral-400 shrink-0">
+                    {{ user.address1|default:'FROM UZBEKISTAN'|upper }} &bull; {{ user.address2|default:'TASHKENT'|upper }}
+                  </span>
+                </div>
+
+                <!-- Center Zone: COMPLETELY OPEN & EMPTY - 100% unobscured view of artwork -->
+                <div class="flex-1 pointer-events-none min-h-[140px] md:min-h-[200px]"></div>
+
+                <!-- Bottom Perimeter: Disciplines, About Summary & Monochrome CTAs -->
+                <div class="pt-3 border-t border-white/10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+                  <!-- About Me Summary & Disciplines -->
+                  <div class="max-w-xl space-y-2">
+                    <div class="flex items-center gap-2.5">
+                      <span data-i18n="about_discipline_craft" class="text-[10px] font-bold tracking-widest uppercase text-neutral-300">DISCIPLINE &amp; CRAFT</span>
+                      <div class="h-px bg-white/15 w-6"></div>
+                      <span class="text-[10px] font-mono tracking-widest uppercase text-neutral-400">
+                        {% for s in about_skills %}{{ s.name|upper }}{% if not forloop.last %} &bull; {% endif %}{% empty %}PYTHON &bull; DJANGO &bull; REST API &bull; POSTGRESQL{% endfor %}
+                      </span>
+                    </div>
+                    <p class="text-xs sm:text-[12px] font-medium leading-relaxed tracking-wider uppercase text-neutral-300">
+                      {{ user.about_statement|default:'I SPECIALIZE IN BUILDING BESPOKE DIGITAL PRODUCTS WHERE PURPOSEFUL EDITORIAL DESIGN MEETS ROBUST ENGINEERING. CREATING EXPERIENCES WITH INTENTIONAL MOTION, SYSTEMATIC RIGOR, AND MEASURABLE IMPACT.'|upper }}
+                    </p>
+                  </div>
+
+                  <!-- Monochrome Action Buttons -->
+                  <div class="flex items-center gap-3 shrink-0 pt-1 md:pt-0">
+                    <a href="javascript:void(0)" onclick="openContactModal()" class="pointer-events-auto px-5 py-2.5 rounded-full bg-white text-black hover:bg-neutral-200 text-xs font-bold tracking-wider uppercase transition-all duration-200 inline-flex items-center gap-2">
+                      <span data-i18n="about_get_in_touch">GET IN TOUCH</span>
+                      <svg class="w-3.5 h-3.5 text-black" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round"></path>
+                      </svg>
+                    </a>
+                    <a href="#services" data-i18n="about_services_cta" class="pointer-events-auto px-5 py-2.5 rounded-full border border-neutral-500 hover:border-white text-white text-xs font-bold tracking-wider uppercase transition-all duration-200">
+                      SERVICES
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card Subtitles (Translate Outward) -->
+            <div class="flex flex-col items-center text-center relative z-10 mt-4 pointer-events-none">
+              <p id="sem-date" data-i18n="about_background_vision" class="text-xl md:text-2xl text-neutral-300 font-semibold tracking-wider uppercase transition-none drop-shadow">
+                BACKGROUND &amp; VISION
+              </p>
+              <p id="sem-scroll-prompt" data-i18n="about_scroll_prompt" class="text-neutral-400 font-medium text-xs tracking-widest uppercase transition-none mt-1 drop-shadow">
+                SCROLL TO EXPAND
+              </p>
+            </div>
+          </div>
+
+          <!-- Splitting Title Header (ABOUT translates left, ME translates right) -->
+          <div class="flex items-center justify-center text-center gap-2 sm:gap-4 w-full relative z-10 pointer-events-none flex-col" style="will-change: transform; backface-visibility: hidden;">
+            <h2 id="sem-title-first" class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white uppercase tracking-tight transition-none drop-shadow-2xl" style="will-change: transform, opacity;">
+              ABOUT
+            </h2>
+            <h2 id="sem-title-rest" class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white uppercase tracking-tight transition-none drop-shadow-2xl" style="will-change: transform, opacity;">
+              ME
+            </h2>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- END: About Section (ScrollExpandMedia Component) -->
+
+  <!-- BEGIN: Experience Section ("Where I've Been" — Horizontal Cinematic Installation) -->
+  <section
+    class="relative w-full bg-[#070709] text-white overflow-visible"
+    data-purpose="experience-section"
+    id="experience"
+    style="height: 280vh;"
+    string="progress"
+    string-id="experience-journey"
+  >
+    <!-- Sticky 100vh Theater / Viewport Window -->
+    <div
+      id="exp-sticky-viewport"
+      class="sticky top-0 w-full h-[100dvh] overflow-hidden bg-[#070709] flex flex-col justify-between select-none"
+    >
+      <!-- Layer 0: Background Cinematic Ambience & Atmospheric Grid -->
+      <div class="absolute inset-0 pointer-events-none opacity-20">
+        <div class="absolute inset-0" style="background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px); background-size: 40px 40px;"></div>
+      </div>
+
+      <!-- Layer 0B: Massive Ambient Horizontal Running Tickers (Layered Depth) -->
+      <div class="absolute inset-0 flex flex-col justify-around pointer-events-none overflow-hidden opacity-[0.035]">
+        <!-- Upper Ticker (Drifting Left) -->
+        <div id="exp-ticker-top" class="whitespace-nowrap font-black uppercase text-[14vw] tracking-tighter will-change-transform leading-none">
+          CREATIVE TECHNOLOGIST &nbsp;&nbsp; FULL STACK ARCHITECTURE &nbsp;&nbsp; CREATIVE TECHNOLOGIST &nbsp;&nbsp; FULL STACK ARCHITECTURE &nbsp;&nbsp;
+        </div>
+        <!-- Lower Ticker (Drifting Right) -->
+        <div id="exp-ticker-bottom" class="whitespace-nowrap font-black uppercase text-[14vw] tracking-tighter will-change-transform leading-none">
+          2023 &nbsp;&nbsp; SELF-DIRECTED LEARNING &nbsp;&nbsp; 2026 &nbsp;&nbsp; FREELANCE SYSTEMS &nbsp;&nbsp; 2023 &nbsp;&nbsp; SELF-DIRECTED LEARNING &nbsp;&nbsp;
+        </div>
+      </div>
+
+      <!-- Top Minimalist Editorial HUD Bar -->
+      <header class="relative z-30 w-full px-6 md:px-14 pt-6 pb-4 flex items-center justify-between border-b border-white/[0.08] backdrop-blur-md bg-[#070709]/80">
+        <div class="flex items-center gap-4">
+          <span
+            id="exp-hud-phase"
+            class="text-[11px] font-semibold tracking-widest uppercase text-neutral-400"
+            data-phase-origin="{{ origin.hud_phase|default:'ORIGIN & FOUNDATIONS'|upper }}"
+            data-phase-learning="{{ chapter_learning.eyebrow|default:'SELF-DIRECTED LEARNING'|upper }}"
+            data-phase-freelance="{{ chapter_freelance.eyebrow|default:'FREELANCE / INDEPENDENT'|upper }}"
+          >
+            {{ origin.hud_phase|default:'ORIGIN & FOUNDATIONS'|upper }}
+          </span>
+        </div>
+        <!-- Progress Tracker Bar (Top Hairline) -->
+        <div class="flex items-center gap-3">
+          <div class="w-24 sm:w-36 h-[2px] bg-white/10 rounded-full overflow-hidden">
+            <div id="exp-hud-progress" class="h-full bg-white transition-all duration-75 w-0"></div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Center: Massive Horizontal Spatial Canvas (Controlled by Vertical Scroll) -->
+      <div class="relative z-20 flex-1 w-full overflow-hidden flex items-center">
+        <div
+          id="exp-horizontal-stage"
+          class="flex items-center h-full will-change-transform transition-none"
+          style="width: 290vw;"
+        >
+          <!-- ================= INTRO ENVIRONMENT (0vw - 90vw) ================= -->
+          <div class="exp-panel flex-shrink-0 w-[95vw] md:w-[85vw] px-8 md:px-16 lg:px-24 flex flex-col justify-center">
+            <div class="max-w-3xl">
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/15 bg-white/[0.04] text-[10px] font-semibold tracking-widest uppercase text-neutral-300 mb-6">
+                <span>{{ origin.badge|default:'ORIGIN & FOUNDATIONS'|upper }}</span>
+              </div>
+              <h2 class="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black uppercase tracking-tight text-white leading-[0.88] mb-8">
+                {{ origin.title|default:"WHERE<br>I'VE BEEN"|safe }}
+              </h2>
+              <p class="text-base sm:text-lg md:text-xl text-neutral-300 leading-relaxed max-w-xl font-normal">
+                {{ origin.description|default:'My professional journey through different roles and environments.' }}
+              </p>
+            </div>
+          </div>
+
+          <!-- ================= CHAPTER 01: LEARNING (90vw - 190vw) ================= -->
+          <div class="exp-panel relative flex-shrink-0 w-[105vw] md:w-[100vw] px-8 md:px-16 lg:px-24 flex flex-col justify-center">
+            <!-- Background Parallax Date Typography -->
+            <div
+              class="exp-date-bg absolute -top-8 right-12 md:right-28 text-[12vw] md:text-[14vw] font-black uppercase text-white/[0.04] tracking-tighter select-none pointer-events-none will-change-transform"
+              data-parallax-factor="0.15"
+            >
+              {{ chapter_learning.date_range|default:'2023 — 2025' }}
+            </div>
+
+            <div class="relative z-10 max-w-4xl">
+              <!-- Eyebrow & Date -->
+              <div class="flex items-center gap-4 mb-4">
+                <span class="text-xs font-semibold tracking-widest uppercase text-neutral-400">
+                  {{ chapter_learning.date_range|default:'2023 — 2025' }}
+                </span>
+                <span class="h-[1px] w-12 bg-white/20"></span>
+                <span class="text-xs font-bold tracking-widest uppercase text-white">
+                  {{ chapter_learning.eyebrow|default:'SELF-DIRECTED LEARNING'|upper }}
+                </span>
+                {% if chapter_learning.badge %}
+                <span class="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full border border-white/20 text-[10px] font-semibold uppercase text-neutral-300">
+                  {{ chapter_learning.badge|upper }}
+                </span>
+                {% endif %}
+              </div>
+
+              <!-- Oversized Typographic Role Title -->
+              <h3 class="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black uppercase tracking-tight text-white leading-[0.92] mb-6">
+                {{ chapter_learning.role_title|default:'CREATIVE<br>TECHNOLOGIST'|upper|safe }}
+              </h3>
+
+              <!-- Narrative Summary -->
+              <p class="text-sm sm:text-base md:text-lg text-neutral-300 leading-relaxed max-w-2xl mb-8">
+                {{ chapter_learning.description|default:'Intensive self-education period exploring web technologies, creative coding, and modern development practices.' }}
+              </p>
+
+              <!-- Milestone Specifications (Hairline Grid) -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-6 border-t border-white/10 max-w-3xl mb-8">
+                <div>
+                  <div class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-1.5">{{ chapter_learning.milestone_1_label|default:'MILESTONE 01'|upper }}</div>
+                  <div class="text-xs sm:text-sm text-neutral-200 font-medium leading-snug">{{ chapter_learning.milestone_1_text|default:'Completed 500+ hours of hands-on development' }}</div>
+                </div>
+                <div>
+                  <div class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-1.5">{{ chapter_learning.milestone_2_label|default:'MILESTONE 02'|upper }}</div>
+                  <div class="text-xs sm:text-sm text-neutral-200 font-medium leading-snug">{{ chapter_learning.milestone_2_text|default:'Mastered React, Node.js, and TypeScript ecosystem' }}</div>
+                </div>
+                <div>
+                  <div class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-1.5">{{ chapter_learning.milestone_3_label|default:'MILESTONE 03'|upper }}</div>
+                  <div class="text-xs sm:text-sm text-neutral-200 font-medium leading-snug">{{ chapter_learning.milestone_3_text|default:'Built portfolio of 15+ production-ready projects' }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================= CHAPTER 02: FREELANCE (190vw - 290vw) ================= -->
+          <div class="exp-panel relative flex-shrink-0 w-[105vw] md:w-[100vw] px-8 md:px-16 lg:px-24 flex flex-col justify-center">
+            <!-- Background Parallax Date Typography -->
+            <div
+              class="exp-date-bg absolute -top-8 right-12 md:right-28 text-[12vw] md:text-[14vw] font-black uppercase text-white/[0.04] tracking-tighter select-none pointer-events-none will-change-transform"
+              data-parallax-factor="0.15"
+            >
+              {{ chapter_freelance.date_range|default:'2026 — PRESENT' }}
+            </div>
+
+            <div class="relative z-10 max-w-4xl">
+              <!-- Eyebrow & Date -->
+              <div class="flex items-center gap-4 mb-4">
+                <span class="text-xs font-semibold tracking-widest uppercase text-neutral-400">
+                  {{ chapter_freelance.date_range|default:'2026 — PRESENT' }}
+                </span>
+                <span class="h-[1px] w-12 bg-white/20"></span>
+                <span class="text-xs font-bold tracking-widest uppercase text-white">
+                  {{ chapter_freelance.eyebrow|default:'FREELANCE / INDEPENDENT'|upper }}
+                </span>
+                {% if chapter_freelance.badge %}
+                <span class="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full border border-white/20 text-[10px] font-semibold uppercase text-neutral-300">
+                  {{ chapter_freelance.badge|upper }}
+                </span>
+                {% endif %}
+              </div>
+
+              <!-- Oversized Typographic Role Title -->
+              <h3 class="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black uppercase tracking-tight text-white leading-[0.92] mb-6">
+                {{ chapter_freelance.role_title|default:'FULL STACK<br>DEVELOPER'|upper|safe }}
+              </h3>
+
+              <!-- Narrative Summary -->
+              <p class="text-sm sm:text-base md:text-lg text-neutral-300 leading-relaxed max-w-2xl mb-8">
+                {{ chapter_freelance.description|default:'Building premium web experiences for clients worldwide. Specializing in interactive frontends, scalable backends, and AI-powered applications.' }}
+              </p>
+
+              <!-- Milestone Specifications (Hairline Grid) -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-6 border-t border-white/10 max-w-3xl mb-8">
+                <div>
+                  <div class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-1.5">{{ chapter_freelance.milestone_1_label|default:'DELIVERY'|upper }}</div>
+                  <div class="text-xs sm:text-sm text-neutral-200 font-medium leading-snug">{{ chapter_freelance.milestone_1_text|default:'Delivered 20+ projects across diverse industries' }}</div>
+                </div>
+                <div>
+                  <div class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-1.5">{{ chapter_freelance.milestone_2_label|default:'INFRASTRUCTURE'|upper }}</div>
+                  <div class="text-xs sm:text-sm text-neutral-200 font-medium leading-snug">{{ chapter_freelance.milestone_2_text|default:'Implemented CI/CD pipelines and cloud architecture' }}</div>
+                </div>
+                <div>
+                  <div class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-1.5">{{ chapter_freelance.milestone_3_label|default:'MOTION SYSTEM'|upper }}</div>
+                  <div class="text-xs sm:text-sm text-neutral-200 font-medium leading-snug">{{ chapter_freelance.milestone_3_text|default:'Created custom animation systems with GSAP and Three.js' }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Bottom Minimalist Editorial Navigation & Spatial Status Bar -->
+      <footer class="relative z-30 w-full px-6 md:px-14 py-4 flex items-center justify-between border-t border-white/[0.08] backdrop-blur-md bg-[#070709]/80">
+        <!-- Interactive Navigation Markers -->
+        <div class="flex items-center gap-2 sm:gap-4">
+          <button
+            type="button"
+            class="exp-jump-btn text-[11px] font-bold tracking-widest uppercase px-3 py-1 rounded-md border border-white/20 text-white bg-white/10 transition-all hover:bg-white/20"
+            data-target-progress="0.30"
+          >
+            {{ chapter_learning.button_label|default:'LEARNING'|upper }}
+          </button>
+          <button
+            type="button"
+            class="exp-jump-btn text-[11px] font-bold tracking-widest uppercase px-3 py-1 rounded-md border border-white/5 text-neutral-500 hover:text-white transition-all hover:border-white/20"
+            data-target-progress="0.75"
+          >
+            {{ chapter_freelance.button_label|default:'FREELANCE'|upper }}
+          </button>
+        </div>
+      </footer>
+    </div>
+  </section>
+  <!-- END: Experience Section -->
+
+  <!-- BEGIN: Featured Project Section -->
+  <section class="max-w-[1400px] mx-auto px-6 md:px-14 py-16" data-purpose="featured-projects" id="projects">
+    <!-- Header -->
+    <div class="mb-8">
+      <h2 data-i18n="title_featured_projects" class="text-3xl md:text-5xl font-black uppercase tracking-tight text-neutral-900">
+        CORE FOCUS
+      </h2>
+    </div>
+
+    <!-- Dynamic Projects Content Area with FlexCarousel -->
+    <div id="projects-content" class="w-full">
+      <div id="flex-carousel-container" class="rounded-3xl border border-neutral-200 bg-[#EFEFEF] overflow-hidden shadow-inner" style="width: 100%; height: 560px; position: relative;">
+        <!-- FlexCarousel mounts here -->
+      </div>
+    </div>
+  </section>
+  <!-- END: Featured Project Section -->
+
+  <!-- BEGIN: Mini Projects (WorksWheel) Section -->
+  <section class="max-w-[1400px] mx-auto px-6 md:px-14 py-16" data-purpose="mini-projects-wheel" id="mini-projects">
+    <!-- Header with Title -->
+    <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div>
+        <h2 data-i18n="title_mini_projects" class="text-3xl md:text-5xl font-black uppercase tracking-tight text-neutral-900">
+          MINI PROJECT
+        </h2>
+      </div>
+    </div>
+
+    <!-- WorksWheel 3D Container -->
+    <div class="w-full relative overflow-hidden" style="height: 640px; min-height: 520px;">
+      <div id="works-wheel-container" class="w-full h-full relative">
+        <!-- WorksWheel mounts here -->
+      </div>
+    </div>
+  </section>
+  <!-- END: Mini Projects Section -->
+
+  <!-- BEGIN: Services Section -->
+  <section class="max-w-[1400px] mx-auto px-6 md:px-14 py-20" data-purpose="services-section" id="services">
+    <!-- Centered Header -->
+    <div class="text-center max-w-2xl mx-auto mb-14">
+      <h2 data-i18n="title_services" class="text-3xl md:text-5xl font-black uppercase tracking-tight text-neutral-900 mb-4">
+        THE SERVICES WE PROVIDE
+      </h2>
+      <p data-i18n="services_subtitle" class="text-xs md:text-xs uppercase font-medium leading-relaxed tracking-wider text-neutral-500">
+        WEBSITES THAT LOOK GREAT AND WORK FLAWLESSLY. WE CREATE VISUALLY APPEALING, FUNCTIONAL WEBSITES TAILORED TO YOUR NEEDS AND GOALS, WITH A CONSISTENT USER EXPERIENCE ON EVERY PLATFORM.
+      </p>
+    </div>
+
+    <!-- Service Pill Rows Accordion -->
+    <div class="max-w-4xl mx-auto flex flex-col space-y-3.5">
+      {% for service in services %}
+      <div id="service-{{ forloop.counter0 }}" onclick="toggleService({{ forloop.counter0 }})" class="accordion-item w-full flex flex-col px-6 py-4 rounded-3xl {% if forloop.counter == 2 or forloop.first and services|length == 1 %}active bg-black text-white shadow-xl scale-[1.01]{% else %}border border-neutral-300 bg-white hover:border-black{% endif %} transition-all cursor-pointer">
+        <div class="flex items-center justify-between">
+          <span class="item-badge w-8 h-8 rounded-full border {% if forloop.counter == 2 or forloop.first and services|length == 1 %}border-neutral-700 text-neutral-300{% else %}border-neutral-300 text-neutral-700{% endif %} flex items-center justify-center text-xs font-medium">{{ service.order|default:forloop.counter }}</span>
+          <span class="item-title text-xs md:text-sm font-bold tracking-widest uppercase {% if forloop.counter == 2 or forloop.first and services|length == 1 %}text-white{% else %}text-neutral-800{% endif %}">{{ service.title }}</span>
+          <div class="item-icon w-8 h-8 rounded-full border {% if forloop.counter == 2 or forloop.first and services|length == 1 %}border-neutral-700 rotate-90{% else %}border-neutral-300 rotate-0{% endif %} flex items-center justify-center transition-transform">
+            <svg class="w-3.5 h-3.5 {% if forloop.counter == 2 or forloop.first and services|length == 1 %}text-white{% else %}text-neutral-700{% endif %}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          </div>
+        </div>
+        <div class="accordion-content">
+          <p class="text-xs {% if forloop.counter == 2 or forloop.first and services|length == 1 %}text-neutral-300{% else %}text-neutral-500{% endif %} leading-relaxed max-w-2xl mb-4">
+            {{ service.description }}
+          </p>
+          <div class="flex items-center justify-between border-t {% if forloop.counter == 2 or forloop.first and services|length == 1 %}border-neutral-800{% else %}border-neutral-200{% endif %} pt-3">
+            <span class="service-deliverables-text text-[11px] font-mono text-neutral-400"><span data-i18n="service_deliverables_label">DELIVERABLES:</span> {{ service.deliverables|upper }}</span>
+            <button onclick="event.stopPropagation(); bookSpecificService('{{ service.title|escapejs }}');" data-i18n="service_inquire" class="text-xs font-bold underline {% if forloop.counter == 2 or forloop.first and services|length == 1 %}text-white hover:text-neutral-300{% else %}hover:text-neutral-600{% endif %}">INQUIRE ↗</button>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  <!-- END: Services Section -->
+
+  <!-- BEGIN: Contact / Let's Talk Footer -->
+  <footer class="w-full bg-[#0D0D0D] text-white pt-20 pb-12 mt-12" data-purpose="footer-section" id="contact">
+    <div class="max-w-[1400px] mx-auto px-6 md:px-14 flex flex-col items-center">
+      
+      <!-- Metallic Callout Headline -->
+      <div class="w-full text-center py-6 md:py-10">
+        <h2 data-i18n="footer_lets_talk" class="text-[12vw] md:text-[8rem] lg:text-[10rem] font-black uppercase leading-none tracking-tight footer-metallic-title select-none cursor-pointer" onclick="openContactModal()">
+          LET’S TALK
+        </h2>
+      </div>
+
+      <!-- Action Button Pills -->
+      <div class="flex flex-wrap items-center justify-center gap-3.5 mt-8 mb-20">
+        {% for btn in buttons %}
+        <a class="px-6 py-2.5 rounded-full border border-neutral-700 hover:border-neutral-400 text-xs font-medium tracking-wider uppercase transition text-neutral-300 hover:text-white" href="{{ btn.link }}" target="_blank" rel="noopener">
+          {{ btn.title|upper }}
+        </a>
+        {% empty %}
+        <a class="px-6 py-2.5 rounded-full border border-neutral-700 hover:border-neutral-400 text-xs font-medium tracking-wider uppercase transition text-neutral-300 hover:text-white" href="https://t.me/khasanoff" target="_blank" rel="noopener">TELEGRAM</a>
+        <a class="px-6 py-2.5 rounded-full border border-neutral-700 hover:border-neutral-400 text-xs font-medium tracking-wider uppercase transition text-neutral-300 hover:text-white" href="https://github.com/XasanovOzodjon" target="_blank" rel="noopener">GITHUB</a>
+        <a class="px-6 py-2.5 rounded-full border border-neutral-700 hover:border-neutral-400 text-xs font-medium tracking-wider uppercase transition text-neutral-300 hover:text-white" href="https://linkedin.com" target="_blank" rel="noopener">LINKEDIN</a>
+        <a class="px-6 py-2.5 rounded-full border border-neutral-700 hover:border-neutral-400 text-xs font-medium tracking-wider uppercase transition text-neutral-300 hover:text-white" href="https://instagram.com" target="_blank" rel="noopener">INSTAGRAM</a>
+        {% endfor %}
+        <button onclick="openContactModal()" data-i18n="footer_contact_me" class="px-7 py-2.5 rounded-full bg-white text-black hover:bg-neutral-200 text-xs font-bold tracking-wider uppercase transition transform hover:scale-105">
+          CONTACT ME
+        </button>
+      </div>
+
+      <!-- Bottom Credits Bar -->
+      <div class="w-full pt-8 border-t border-neutral-900 flex flex-col md:flex-row items-center justify-between text-[10px] tracking-widest uppercase text-neutral-600 font-semibold gap-4">
+        <div data-i18n="footer_rights">EGO PORTFOLIO. ALL RIGHTS RESERVED</div>
+        <div>BACKEND ARCHITECT &bull; {{ user.first_name|default:'OZODJON'|upper }} {{ user.last_name|default:'XASANOV'|upper }}</div>
+      </div>
+
+    </div>
+  </footer>
+  <!-- END: Contact / Let's Talk Footer -->
+  </div><!-- END: #page-wrapper -->
+
+  <!-- MODAL: Project Detail Modal -->
+  <div id="project-modal" onclick="if(event.target === this) closeProjectModal()" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-md opacity-0 pointer-events-none flex items-center justify-center p-4">
+    <div id="project-modal-card" class="bg-white rounded-[32px] max-w-2xl w-full max-h-[90vh] overflow-y-auto no-scrollbar p-6 sm:p-8 md:p-9 shadow-2xl border border-neutral-100 opacity-0 scale-[0.94] translate-y-4 relative">
+      <div class="relative text-center pb-4 mb-5 border-b border-neutral-100">
+        <span id="modal-project-category" class="block text-[11px] font-bold tracking-widest uppercase text-neutral-400 mb-1">CATEGORY</span>
+        <h3 id="modal-project-title" class="text-2xl sm:text-3xl font-black uppercase text-neutral-900 tracking-tight">PROJECT TITLE</h3>
+        <button onclick="closeProjectModal()" class="absolute right-0 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full border border-neutral-200 flex items-center justify-center text-neutral-500 hover:border-black hover:text-black hover:bg-neutral-50 transition-colors" aria-label="Close modal">✕</button>
+      </div>
+      <div id="modal-project-body" class="space-y-5 text-sm text-neutral-700">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Contact Form Modal -->
+  <div id="contact-modal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300 flex items-center justify-center p-4">
+    <div id="contact-modal-card" class="bg-white rounded-3xl max-w-lg w-full p-6 md:p-8 shadow-2xl transform scale-95 transition-transform duration-300">
+      <div class="flex justify-between items-center border-b border-neutral-200 pb-4 mb-6">
+        <div>
+          <span data-i18n="modal_start_conversation" class="text-[10px] font-bold tracking-widest uppercase text-neutral-400">START A CONVERSATION</span>
+          <h3 data-i18n="modal_lets_build" class="text-xl font-black uppercase text-neutral-900">LET'S BUILD SOMETHING</h3>
+        </div>
+        <button onclick="closeContactModal()" class="w-8 h-8 rounded-full border border-neutral-300 flex items-center justify-center text-neutral-600 hover:border-black hover:text-black">✕</button>
+      </div>
+      
+      <form id="contact-form" onsubmit="submitContactForm(event)" class="space-y-4">
+        <div>
+          <label data-i18n="modal_lbl_name" class="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1">Your Name</label>
+          <input type="text" id="contact-name" required placeholder="John Doe" class="w-full px-4 py-2.5 rounded-xl border border-neutral-300 focus:outline-none focus:border-black text-sm">
+        </div>
+        <div>
+          <label data-i18n="modal_lbl_email" class="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1">Your Email</label>
+          <input type="email" id="contact-email" required placeholder="john@company.com" class="w-full px-4 py-2.5 rounded-xl border border-neutral-300 focus:outline-none focus:border-black text-sm">
+        </div>
+        <div>
+          <label data-i18n="modal_lbl_service" class="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1">Interested Service</label>
+          <select id="contact-service" class="w-full px-4 py-2.5 rounded-xl border border-neutral-300 focus:outline-none focus:border-black text-sm bg-white">
+            {% for s in services %}
+            <option value="{{ s.title }}">{{ s.title }}</option>
+            {% empty %}
+            <option value="General Inquiry">General Inquiry</option>
+            {% endfor %}
+            <option value="Custom Project">Custom Project</option>
+          </select>
+        </div>
+        <div>
+          <label data-i18n="modal_lbl_message" class="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1">Message</label>
+          <textarea id="contact-message" rows="3" required placeholder="Tell me about your project, goals, and timeline..." class="w-full px-4 py-2 rounded-xl border border-neutral-300 focus:outline-none focus:border-black text-sm"></textarea>
+        </div>
+        <button type="submit" data-i18n="modal_btn_send" class="w-full py-3 bg-black text-white rounded-xl text-xs font-bold tracking-widest uppercase hover:bg-neutral-800 transition">
+          SEND MESSAGE
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Cart Drawer / Modal -->
+  <div id="cart-modal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300 flex items-center justify-center p-4">
+    <div id="cart-modal-card" class="bg-white rounded-3xl max-w-md w-full p-6 md:p-8 shadow-2xl transform scale-95 transition-transform duration-300">
+      <div class="flex justify-between items-center border-b border-neutral-200 pb-4 mb-4">
+        <h3 class="text-lg font-black uppercase text-neutral-900">SHOPPING BAG</h3>
+        <button onclick="closeCartModal()" class="w-8 h-8 rounded-full border border-neutral-300 flex items-center justify-center text-neutral-600 hover:border-black hover:text-black">✕</button>
+      </div>
+      <div id="cart-items" class="py-4 space-y-3 min-h-[120px] max-h-[300px] overflow-y-auto">
+        <p class="text-xs text-neutral-400 text-center py-8">Your bag is empty.</p>
+      </div>
+      <div class="border-t border-neutral-200 pt-4 mt-2">
+        <div class="flex justify-between items-center font-bold text-sm mb-4">
+          <span>SUBTOTAL</span>
+          <span id="cart-total">$0.00</span>
+        </div>
+        <button onclick="checkoutCart()" class="w-full py-3 bg-black text-white rounded-xl text-xs font-bold tracking-widest uppercase hover:bg-neutral-800 transition">
+          PROCEED TO CHECKOUT
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT: Comprehensive Interactivity -->
+  <script>
+    // Cart state
+    let cart = [];
+
+    // Project data details
+    const projectsData = {
+      solar: {
+        category: 'APP DESIGN',
+        title: 'SOLAR PANEL MOBILE APP',
+        description: 'An intelligent energy management application that allows users to monitor real-time photovoltaic output, battery reserve statuses, and grid export rates.',
+        deliverables: ['Real-time IoT Telemetry Interface', 'Dark Mode High-Contrast UI', 'Custom Interactive Solar Graphs', 'Battery Degradation Predictor'],
+        tools: ['Figma', 'React Native', 'Tailwind', 'SwiftUI'],
+        stats: '428.4 kWh daily monitoring capacity with 99.8% precision telemetry.'
+      },
+      furniture: {
+        category: 'FURNITURE APP',
+        title: 'OUR GROUNDBREAKING FURNITURE',
+        description: 'A minimalist architectural furniture e-commerce experience designed for curated designer objects, featuring augmented reality preview and fluid one-tap checkout.',
+        deliverables: ['Editorial Product Showcase', 'Minimal Cart Flow', 'Haptic Interactions', 'AR Object Viewer'],
+        tools: ['Figma', 'Three.js', 'Next.js', 'Stripe'],
+        stats: 'Featured piece: Hand-carved Wood Chair ($140.00).'
+      },
+      atelier: {
+        category: 'WEB DESIGN',
+        title: 'ATELIER MONOCHROME STUDIO',
+        description: 'A bespoke editorial web portfolio for an international Scandinavian architecture practice. Built with subtle typography gradients, fluid scroll interactions, and monolithic layout grids.',
+        deliverables: ['Editorial Layout System', 'Custom Typography Styling', 'Full Responsive CMS', 'Scroll-linked Animations'],
+        tools: ['Figma', 'Webflow', 'GSAP', 'Barba.js'],
+        stats: 'Awarded Site of the Day for Editorial Excellence.'
+      },
+      nexus: {
+        category: 'WEB APPLICATION',
+        title: 'NEXUS AI ANALYTICS PLATFORM',
+        description: 'A mission-critical observability and analytics console for distributed systems. Real-time telemetry, cluster health maps, and predictive query cost forecasting.',
+        deliverables: ['Real-time Stream Canvas', 'Data Visualization System', 'Keyboard-Driven Command Palette', 'Micro-interactions'],
+        tools: ['React', 'TypeScript', 'Tailwind', 'D3.js'],
+        stats: 'Processes over 1.2M queries per second at 12ms average latency.'
+      }
+    };
+
+    // Filter projects
+    function filterProjects(filter) {
+      const tabs = {
+        all: document.getElementById('filter-all'),
+        web: document.getElementById('filter-web'),
+        landing: document.getElementById('filter-landing')
+      };
+
+      Object.keys(tabs).forEach(k => {
+        if (!tabs[k]) return;
+        if (k === filter) {
+          tabs[k].className = 'filter-tab px-6 py-2.5 rounded-full bg-black text-white text-xs font-semibold tracking-wider uppercase shadow-sm transition';
+        } else {
+          tabs[k].className = 'filter-tab px-6 py-2.5 rounded-full bg-white border border-neutral-300 text-neutral-700 hover:border-black text-xs font-semibold tracking-wider uppercase transition';
+        }
+      });
+
+      const cards = document.querySelectorAll('.project-card');
+      cards.forEach(card => {
+        if (filter === 'all') {
+          card.style.display = 'flex';
+        } else if (filter === 'web') {
+          card.style.display = card.classList.contains('web-project') ? 'flex' : 'none';
+        } else if (filter === 'landing') {
+          card.style.display = card.classList.contains('landing-project') ? 'flex' : 'none';
+        }
+      });
+    }
+
+    // Services Accordion Logic
+    function toggleService(index) {
+      const items = document.querySelectorAll('.accordion-item');
+      items.forEach((item, i) => {
+        const badge = item.querySelector('.item-badge');
+        const title = item.querySelector('.item-title');
+        const icon = item.querySelector('.item-icon');
+        const iconSvg = icon.querySelector('svg');
+
+        if (i === index) {
+          const isActive = item.classList.contains('active');
+          if (isActive && items.length > 1) {
+            // Optional: toggle off or keep active
+          } else {
+            item.classList.add('active', 'bg-black', 'text-white', 'shadow-xl', 'scale-[1.01]');
+            item.classList.remove('bg-white', 'text-neutral-800', 'border-neutral-300');
+            badge.className = 'item-badge w-8 h-8 rounded-full border border-neutral-700 flex items-center justify-center text-xs font-medium text-neutral-300';
+            title.className = 'item-title text-xs md:text-sm font-bold tracking-widest uppercase text-white';
+            icon.className = 'item-icon w-8 h-8 rounded-full border border-neutral-700 flex items-center justify-center transition-transform rotate-90';
+            iconSvg.className = 'w-3.5 h-3.5 text-white';
+          }
+        } else {
+          item.classList.remove('active', 'bg-black', 'text-white', 'shadow-xl', 'scale-[1.01]');
+          item.classList.add('bg-white', 'text-neutral-800', 'border-neutral-300');
+          badge.className = 'item-badge w-8 h-8 rounded-full border border-neutral-300 flex items-center justify-center text-xs font-medium text-neutral-700';
+          title.className = 'item-title text-xs md:text-sm font-bold tracking-widest uppercase text-neutral-800';
+          icon.className = 'item-icon w-8 h-8 rounded-full border border-neutral-300 flex items-center justify-center transition-transform rotate-0';
+          iconSvg.className = 'w-3.5 h-3.5 text-neutral-700';
+        }
+      });
+    }
+
+    function selectService(index) {
+      const items = document.querySelectorAll('.accordion-item');
+      if (items && items[index]) {
+        toggleService(index);
+      }
+    }
+
+    function bookSpecificService(serviceName) {
+      openContactModal();
+      const select = document.getElementById('contact-service');
+      if (select) {
+        for (let i = 0; i < select.options.length; i++) {
+          if (select.options[i].text.includes(serviceName) || select.options[i].value.includes(serviceName)) {
+            select.selectedIndex = i;
+            break;
+          }
+        }
+      }
+    }
+
+    // Modal Handlers
+    function openProjectModal(itemOrKey) {
+      let data = null;
+      if (typeof itemOrKey === 'object' && itemOrKey !== null) {
+        data = itemOrKey;
+      } else {
+        data = projectsData[itemOrKey];
+      }
+      if (!data) return;
+
+      const curLang = (typeof getCurrentLang === 'function') ? getCurrentLang() : 'en';
+      const t = (typeof UI_TRANSLATIONS !== 'undefined' && UI_TRANSLATIONS[curLang]) ? UI_TRANSLATIONS[curLang] : (UI_TRANSLATIONS['en'] || {
+        deliverables: 'DELIVERABLES',
+        tools_and_tech: 'TOOLS & TECH',
+        view_live: 'VIEW LIVE ↗',
+        private_github: '🔒 Private GitHub',
+        inquire_btn: 'INQUIRE ↗',
+        highlights_label: "KEY HIGHLIGHTS"
+      });
+
+      const defaultCategory = curLang === 'uz' ? 'ASOSIY LOYIHA' : (curLang === 'ru' ? 'ИЗБРАННЫЙ ПРОЕКТ' : 'FEATURED PROJECT');
+      const category = data.subtitle || data.category || defaultCategory;
+      const title = data.title || 'PROJECT DETAILS';
+      document.getElementById('modal-project-category').innerText = category;
+      document.getElementById('modal-project-title').innerText = title;
+      
+      let html = '';
+      if (data.src) {
+        const webpSrc = data.src.replace(/\.(png|jpe?g)$/i, '.webp');
+        const fallbackSrc = data.src.replace(/\.webp$/i, '.png');
+        html += `
+          <div class="w-full h-52 sm:h-64 rounded-2xl overflow-hidden border border-neutral-200/80 bg-neutral-100 shadow-inner">
+            <picture class="w-full h-full block">
+              <source srcset="${webpSrc}" type="image/webp">
+              <source srcset="${fallbackSrc}" type="image/png">
+              <img src="${webpSrc}" alt="${data.alt || title}" width="800" height="500" loading="lazy" decoding="async" class="w-full h-full object-cover object-top" onerror="this.src='${fallbackSrc}'" />
+            </picture>
+          </div>
+        `;
+      }
+      if (data.description) {
+        html += `<p class="text-neutral-600 leading-relaxed font-normal text-sm sm:text-base text-center max-w-xl mx-auto">${data.description}</p>`;
+      }
+      if (data.stats) {
+        html += `
+          <div class="bg-neutral-50 p-4 rounded-2xl border border-neutral-200 text-center">
+            <p class="text-[11px] font-bold uppercase tracking-wider text-neutral-500 mb-1">${t.highlights_label || 'Key Highlights'}</p>
+            <p class="text-xs text-neutral-800 font-medium">${data.stats}</p>
+          </div>
+        `;
+      }
+      if (data.deliverables && data.deliverables.length) {
+        html += `
+          <div>
+            <h4 class="text-xs font-bold uppercase tracking-wider text-black mb-2 text-center">${t.deliverables || 'DELIVERABLES'}</h4>
+            <ul class="list-disc pl-5 space-y-1 text-xs text-neutral-600 max-w-md mx-auto">
+              ${data.deliverables.map(d => `<li>${d}</li>`).join('')}
+            </ul>
+          </div>
+        `;
+      }
+      if (data.tools && data.tools.length) {
+        html += `
+          <div>
+            <h4 class="text-xs font-bold uppercase tracking-wider text-black mb-2 text-center">${t.tools_and_tech || 'TOOLS & TECH'}</h4>
+            <div class="flex flex-wrap justify-center gap-2">
+              ${data.tools.map(t => `<span class="px-3 py-1 bg-neutral-100 border border-neutral-200 text-neutral-800 text-[10px] font-semibold rounded-full uppercase">${t}</span>`).join('')}
+            </div>
+          </div>
+        `;
+      }
+      html += `<div class="pt-4 flex flex-wrap justify-center items-center gap-3">`;
+      
+      // GitHub Button (with lock icon if private)
+      if (data.is_github_private) {
+        html += `
+          <span class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-neutral-100 text-neutral-600 border border-neutral-300 text-xs font-bold uppercase tracking-wider cursor-not-allowed select-none shadow-sm" title="Ushbu repozitoriy yopiq (Private)">
+            <svg class="w-4 h-4 text-neutral-700" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.243 2 7 4.243 7 7v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7c0-2.757-2.243-5-5-5zm-3 5c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9V7zm3 10a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+            <span>${t.private_github || '🔒 Private GitHub'}</span>
+          </span>
+        `;
+      } else if (data.github_link) {
+        html += `
+          <a href="${data.github_link}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-white text-neutral-900 border border-neutral-300 text-xs font-bold uppercase tracking-wider hover:border-black hover:bg-neutral-50 transition-all shadow-sm hover:scale-105 active:scale-95">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+            <span>GitHub ↗</span>
+          </a>
+        `;
+      } else {
+        html += `
+          <span class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-neutral-100 text-neutral-500 border border-neutral-200 text-xs font-bold uppercase tracking-wider cursor-not-allowed select-none shadow-sm" title="Repozitoriy mavjud emas yoki yopiq">
+            <svg class="w-4 h-4 text-neutral-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.243 2 7 4.243 7 7v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7c0-2.757-2.243-5-5-5zm-3 5c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9V7zm3 10a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+            <span>${t.private_github || '🔒 Private GitHub'}</span>
+          </span>
+        `;
+      }
+
+      // View Button (Live site)
+      if (data.link && data.link !== '#' && !data.link.startsWith('#')) {
+        html += `
+          <a href="${data.link}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full bg-black text-white text-xs font-bold uppercase tracking-wider hover:bg-neutral-800 transition-all shadow-md hover:shadow-xl hover:scale-105 active:scale-95">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            <span>${t.view_live || 'VIEW LIVE ↗'}</span>
+          </a>
+        `;
+      } else {
+        html += `
+          <button onclick="event.stopPropagation(); closeProjectModal(); openContactModal();" class="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full bg-black text-white text-xs font-bold uppercase tracking-wider hover:bg-neutral-800 transition-all shadow-md hover:scale-105 active:scale-95">
+            <span>${t.inquire_btn || 'MUROJAAT QILISH ↗'}</span>
+          </button>
+        `;
+      }
+
+      html += `</div>`;
+
+      document.getElementById('modal-project-body').innerHTML = html;
+
+      const modal = document.getElementById('project-modal');
+      const card = document.getElementById('project-modal-card');
+      if (!modal || !card) return;
+
+      modal.classList.remove('pointer-events-none');
+      void modal.offsetWidth; // Force reflow so transition starts cleanly
+      requestAnimationFrame(() => {
+        modal.classList.remove('opacity-0');
+        card.classList.remove('opacity-0', 'scale-[0.94]', 'translate-y-4');
+        card.classList.add('opacity-100', 'scale-100', 'translate-y-0');
+      });
+    }
+    window.openProjectModal = openProjectModal;
+
+    function closeProjectModal() {
+      const modal = document.getElementById('project-modal');
+      const card = document.getElementById('project-modal-card');
+      if (!modal || !card) return;
+
+      modal.classList.add('opacity-0');
+      card.classList.remove('opacity-100', 'scale-100', 'translate-y-0');
+      card.classList.add('opacity-0', 'scale-[0.94]', 'translate-y-4');
+      setTimeout(() => {
+        if (modal.classList.contains('opacity-0')) {
+          modal.classList.add('pointer-events-none');
+        }
+      }, 400);
+    }
+
+    function openContactModal() {
+      const modal = document.getElementById('contact-modal');
+      const card = document.getElementById('contact-modal-card');
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      card.classList.remove('scale-95');
+      card.classList.add('scale-100');
+    }
+
+    function closeContactModal() {
+      const modal = document.getElementById('contact-modal');
+      const card = document.getElementById('contact-modal-card');
+      modal.classList.add('opacity-0', 'pointer-events-none');
+      card.classList.remove('scale-100');
+      card.classList.add('scale-95');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const modal = document.getElementById('project-modal');
+        if (modal && !modal.classList.contains('pointer-events-none')) {
+          closeProjectModal();
+        }
+      }
+    });
+
+    async function submitContactForm(e) {
+      e.preventDefault();
+      const name = document.getElementById('contact-name').value.trim();
+      const email = document.getElementById('contact-email') ? document.getElementById('contact-email').value.trim() : '';
+      const service = document.getElementById('contact-service') ? document.getElementById('contact-service').value : 'General';
+      const messageEl = document.getElementById('contact-message');
+      const messageText = messageEl ? messageEl.value.trim() : '';
+
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalText = submitBtn ? submitBtn.innerText : 'SEND';
+      if (submitBtn) {
+        submitBtn.innerText = 'YUBORILMOQDA...';
+        submitBtn.disabled = true;
+      }
+
+      try {
+        const res = await fetch('/api/contact/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: name,
+            email: email,
+            message: `[Tanlangan yo'nalish: ${service}]\n${messageText}`
+          })
+        });
+        const result = await res.json();
+        closeContactModal();
+        if (result.success) {
+          showToast(result.message || `Rahmat, ${name}! Xabaringiz muvaffaqiyatli qabul qilindi.`);
+          document.getElementById('contact-form').reset();
+        } else {
+          showToast(result.message || 'Xatolik yuz berdi. Qaytadan urinib ko\'ring.');
+        }
+      } catch (err) {
+        closeContactModal();
+        showToast(`Rahmat, ${name}! Xabaringiz qabul qilindi.`);
+        document.getElementById('contact-form').reset();
+      } finally {
+        if (submitBtn) {
+          submitBtn.innerText = originalText;
+          submitBtn.disabled = false;
+        }
+      }
+    }
+
+    // Cart Handlers
+    function addToCart(title, price) {
+      cart.push({ title, price, id: Date.now() });
+      updateCartUI();
+      showToast(`Added ${title} ($${price.toFixed(2)}) to your bag.`);
+    }
+
+    function updateCartUI() {
+      const badge = document.getElementById('cart-badge');
+      if (cart.length > 0) {
+        badge.innerText = cart.length;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+
+      const list = document.getElementById('cart-items');
+      const totalEl = document.getElementById('cart-total');
+      if (cart.length === 0) {
+        list.innerHTML = `<p class="text-xs text-neutral-400 text-center py-8">Your bag is empty.</p>`;
+        totalEl.innerText = '$0.00';
+      } else {
+        let total = 0;
+        list.innerHTML = cart.map((item, idx) => {
+          total += item.price;
+          return `
+            <div class="flex items-center justify-between p-3 bg-neutral-50 rounded-xl border border-neutral-200">
+              <div>
+                <p class="text-xs font-bold text-black uppercase">${item.title}</p>
+                <p class="text-xs text-neutral-500 font-mono">$${item.price.toFixed(2)}</p>
+              </div>
+              <button onclick="removeFromCart(${idx})" class="text-xs text-red-500 hover:underline">Remove</button>
+            </div>
+          `;
+        }).join('');
+        totalEl.innerText = `$${total.toFixed(2)}`;
+      }
+    }
+
+    function removeFromCart(idx) {
+      cart.splice(idx, 1);
+      updateCartUI();
+    }
+
+    function openCartModal() {
+      updateCartUI();
+      const modal = document.getElementById('cart-modal');
+      const card = document.getElementById('cart-modal-card');
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      card.classList.remove('scale-95');
+      card.classList.add('scale-100');
+    }
+
+    function closeCartModal() {
+      const modal = document.getElementById('cart-modal');
+      const card = document.getElementById('cart-modal-card');
+      modal.classList.add('opacity-0', 'pointer-events-none');
+      card.classList.remove('scale-100');
+      card.classList.add('scale-95');
+    }
+
+    function checkoutCart() {
+      if (cart.length === 0) {
+        showToast('Your bag is currently empty.');
+        return;
+      }
+      closeCartModal();
+      showToast('Redirecting to secure checkout...');
+      setTimeout(() => {
+        cart = [];
+        updateCartUI();
+        showToast('Order confirmed! Thank you for supporting designer craftsmanship.');
+      }, 1000);
+    }
+
+    // Interactive micro-interactions
+    function toggleHeart(btn) {
+      if (btn.innerText === '♡') {
+        btn.innerText = '♥';
+        btn.classList.add('text-red-500');
+        btn.classList.remove('text-neutral-400');
+        showToast('Added Wood Chair to saved items.');
+      } else {
+        btn.innerText = '♡';
+        btn.classList.remove('text-red-500');
+        btn.classList.add('text-neutral-400');
+      }
+    }
+
+    function triggerSolarAction() {
+      const kwh = document.getElementById('solar-kwh');
+      if (kwh) {
+        kwh.innerText = (parseFloat(kwh.innerText) + 0.8).toFixed(1) + ' kWh';
+      }
+      showToast('Live solar telemetry synchronized (+0.8 kWh).');
+    }
+
+    function copyContactEmail() {
+      const email = 'hello@example.com';
+      navigator.clipboard?.writeText(email);
+      showToast('Copied email: hello@example.com');
+    }
+
+    function toggleMobileMenu() {
+      const drawer = document.getElementById('mobile-drawer');
+      const content = document.getElementById('mobile-drawer-content');
+      const isOpen = !drawer.classList.contains('pointer-events-none');
+
+      if (isOpen) {
+        drawer.classList.add('opacity-0', 'pointer-events-none');
+        content.classList.add('translate-x-full');
+      } else {
+        drawer.classList.remove('opacity-0', 'pointer-events-none');
+        content.classList.remove('translate-x-full');
+      }
+    }
+
+    // Toast notification helper
+    function showToast(message) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'bg-black text-white px-5 py-3 rounded-full text-xs font-semibold shadow-2xl flex items-center gap-2 transform translate-y-4 opacity-0 transition-all duration-300 pointer-events-auto border border-neutral-700';
+      toast.innerHTML = `<span>●</span><span>${message}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-4', 'opacity-0');
+      }, 10);
+
+      setTimeout(() => {
+        toast.classList.add('translate-y-4', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // Localization dictionary
+    const UI_TRANSLATIONS = {
+      uz: {
+        nav_home: "BOSH SAHIFA",
+        nav_about: "MEN HAQIMDA",
+        nav_experience: "TAJRIBA",
+        nav_projects: "LOYIHALAR",
+        nav_mini_projects: "MINI LOYIHALAR",
+        nav_services: "XIZMATLAR",
+        nav_contact: "BOG’LANISH",
+        about_discipline_craft: "SOHA VA MAHORAT",
+        about_get_in_touch: "BOG’LANING",
+        about_services_cta: "XIZMATLAR",
+        about_background_vision: "YO’LIM VA MAQSADIM",
+        about_scroll_prompt: "BATAFSIL KO’RISH UCHUN PASTGA SURING",
+        title_featured_projects: "ASOSIY LOYIHALAR",
+        title_mini_projects: "MINI LOYIHALAR",
+        title_services: "XIZMATLAR",
+        dropdown_lang_title: "TILNI TANLANG",
+        services_subtitle: "KO’ZNI QUVONTIRADIGAN VA BENUQSON ISHLAYDIGAN VEB-SAYTLAR. MIJOZNING EHTIYOJ VA MAQSADLARIGA MOSLASHTIRILGAN, VIZUAL JIHATDAN JOZIBADOR VA FUNKSIONAL SAYTLAR YARATAMIZ. BARCHA QURILMALARDA BIR XIL QULAY FOYDALANUVCHI TAJRIBASINI TA’MINLAYMIZ.",
+        service_deliverables_label: "BAJARILGAN ISHLAR:",
+        service_inquire: "MUROJAAT QILISH ↗",
+        footer_lets_talk: "BOG’LANISH",
+        footer_contact_me: "MENGA YOZING",
+        footer_rights: "EGO PORTFOLIO. BARCHA HUQUQLAR HIMOYALANGAN",
+        modal_start_conversation: "SUHBATNI BOSHLAYLIK",
+        modal_lets_build: "BIRGALIKDA NIMADIR YARATAYLIK",
+        modal_lbl_name: "Ismingiz",
+        modal_lbl_email: "Elektron pochtangiz",
+        modal_lbl_service: "Qaysi xizmat qiziqtiradi?",
+        modal_lbl_message: "Xabaringiz",
+        modal_btn_send: "XABAR YUBORISH",
+        tools_and_tech: "ASBOBLAR VA TEXNOLOGIYALAR",
+        deliverables: "BAJARILGAN ISHLAR",
+        view_live: "SAYTNI KO’RISH ↗",
+        private_github: "🔒 Yopiq GitHub",
+        inquire_btn: "MUROJAAT QILISH ↗",
+        highlights_label: "ASOSIY KO'RSATKICHLAR"
+      },
+      en: {
+        nav_home: "HOME",
+        nav_about: "ABOUT",
+        nav_experience: "EXPERIENCE",
+        nav_projects: "PROJECTS",
+        nav_mini_projects: "MINI PROJECT",
+        nav_services: "SERVICES",
+        nav_contact: "CONTACT",
+        about_discipline_craft: "DISCIPLINE & CRAFT",
+        about_get_in_touch: "GET IN TOUCH",
+        about_services_cta: "SERVICES",
+        about_background_vision: "BACKGROUND & VISION",
+        about_scroll_prompt: "SCROLL TO EXPAND",
+        title_featured_projects: "CORE FOCUS",
+        title_mini_projects: "MINI PROJECT",
+        title_services: "THE SERVICES WE PROVIDE",
+        dropdown_lang_title: "SELECT LANGUAGE",
+        services_subtitle: "WEBSITES THAT LOOK GREAT AND WORK FLAWLESSLY. WE CREATE VISUALLY APPEALING, FUNCTIONAL WEBSITES TAILORED TO YOUR NEEDS AND GOALS, WITH A CONSISTENT USER EXPERIENCE ON EVERY PLATFORM.",
+        service_deliverables_label: "DELIVERABLES:",
+        service_inquire: "INQUIRE ↗",
+        footer_lets_talk: "LET’S TALK",
+        footer_contact_me: "CONTACT ME",
+        footer_rights: "EGO PORTFOLIO. ALL RIGHTS RESERVED",
+        modal_start_conversation: "START A CONVERSATION",
+        modal_lets_build: "LET’S BUILD SOMETHING",
+        modal_lbl_name: "Your Name",
+        modal_lbl_email: "Your Email",
+        modal_lbl_service: "Interested Service",
+        modal_lbl_message: "Message",
+        modal_btn_send: "SEND MESSAGE",
+        tools_and_tech: "TOOLS & TECH",
+        deliverables: "DELIVERABLES",
+        view_live: "VIEW LIVE ↗",
+        private_github: "🔒 Private GitHub",
+        inquire_btn: "INQUIRE ↗",
+        highlights_label: "KEY HIGHLIGHTS"
+      },
+      ru: {
+        nav_home: "ГЛАВНАЯ",
+        nav_about: "ОБО МНЕ",
+        nav_experience: "ОПЫТ",
+        nav_projects: "ПРОЕКТЫ",
+        nav_mini_projects: "МИНИ-ПРОЕКТЫ",
+        nav_services: "УСЛУГИ",
+        nav_contact: "СВЯЗАТЬСЯ",
+        about_discipline_craft: "НАПРАВЛЕНИЕ И МАСТЕРСТВО",
+        about_get_in_touch: "СВЯЖИТЕСЬ СО МНОЙ",
+        about_services_cta: "УСЛУГИ",
+        about_background_vision: "ПУТЬ И ВИДЕНИЕ",
+        about_scroll_prompt: "ПРОКРУТИТЕ, ЧТОБЫ РАСКРЫТЬ",
+        title_featured_projects: "ОСНОВНЫЕ ПРОЕКТЫ",
+        title_mini_projects: "МИНИ-ПРОЕКТЫ",
+        title_services: "УСЛУГИ",
+        dropdown_lang_title: "ВЫБЕРИТЕ ЯЗЫК",
+        services_subtitle: "САЙТЫ, КОТОРЫЕ ВПЕЧАТЛЯЮТ ВНЕШНЕ И БЕЗУПРЕЧНО РАБОТАЮТ. СОЗДАЁМ ВИЗУАЛЬНО ПРИВЛЕКАТЕЛЬНЫЕ И ФУНКЦИОНАЛЬНЫЕ САЙТЫ, АДАПТИРОВАННЫЕ ПОД ПОТРЕБНОСТИ И ЦЕЛИ КЛИЕНТА, С ЕДИНЫМ УДОБНЫМ ОПЫТОМ НА ВСЕХ ПЛАТФОРМАХ.",
+        service_deliverables_label: "ЧТО СДЕЛАНО:",
+        service_inquire: "ОСТАВИТЬ ЗАПРОС ↗",
+        footer_lets_talk: "СВЯЗАТЬСЯ",
+        footer_contact_me: "НАПИСАТЬ МНЕ",
+        footer_rights: "EGO PORTFOLIO. ВСЕ ПРАВА ЗАЩИЩЕНЫ",
+        modal_start_conversation: "НАЧАТЬ ДИАЛОГ",
+        modal_lets_build: "СОЗДАДИМ ЧТО-НИБУДЬ ВМЕСТЕ",
+        modal_lbl_name: "Ваше имя",
+        modal_lbl_email: "Ваш email",
+        modal_lbl_service: "Интересующая услуга",
+        modal_lbl_message: "Ваше сообщение",
+        modal_btn_send: "ОТПРАВИТЬ СООБЩЕНИЕ",
+        tools_and_tech: "ИНСТРУМЕНТЫ И ТЕХНОЛОГИИ",
+        deliverables: "ЧТО СДЕЛАНО",
+        view_live: "СМОТРЕТЬ ОНЛАЙН ↗",
+        private_github: "🔒 Приватный GitHub",
+        inquire_btn: "ОСТАВИТЬ ЗАПРОС ↗",
+        highlights_label: "КЛЮЧЕВЫЕ ПОКАЗАТЕЛИ"
+      }
+    };
+
+    function getCurrentLang() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlLang = urlParams.get('lang');
+      if (urlLang && ['uz', 'en', 'ru'].includes(urlLang)) {
+        return urlLang;
+      }
+      const savedLang = localStorage.getItem('ego_portfolio_lang');
+      if (savedLang && ['uz', 'en', 'ru'].includes(savedLang)) {
+        return savedLang;
+      }
+      return '{{ current_lang|default:"en" }}';
+    }
+
+    function applyTranslations(lang) {
+      const dict = UI_TRANSLATIONS[lang] || UI_TRANSLATIONS['en'];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) {
+          el.textContent = dict[key];
+        }
+      });
+    }
+
+    // Language Switcher Logic
+    function toggleLangDropdown(e) {
+      if (e) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+      const dropdown = document.getElementById('lang-dropdown-menu');
+      const arrow = document.getElementById('lang-dropdown-arrow');
+      if (dropdown) {
+        const isClosed = dropdown.classList.toggle('hidden');
+        if (arrow) {
+          if (!isClosed) {
+            arrow.classList.add('rotate-180');
+          } else {
+            arrow.classList.remove('rotate-180');
+          }
+        }
+      }
+    }
+
+    function selectLang(lang) {
+      localStorage.setItem('ego_portfolio_lang', lang);
+      document.cookie = 'django_language=' + lang + '; path=/; max-age=31536000';
+      const dropdown = document.getElementById('lang-dropdown-menu');
+      const arrow = document.getElementById('lang-dropdown-arrow');
+      if (dropdown) dropdown.classList.add('hidden');
+      if (arrow) arrow.classList.remove('rotate-180');
+
+      const currentUrl = new URL(window.location.href);
+      if (currentUrl.searchParams.get('lang') !== lang) {
+        currentUrl.searchParams.set('lang', lang);
+        window.location.href = currentUrl.toString();
+      } else {
+        updateLangUI(lang);
+        applyTranslations(lang);
+        showToast(lang === 'uz' ? "Til tanlandi: O'zbekcha 🇺🇿" : (lang === 'ru' ? "Язык выбран: Русский 🇷🇺" : "Language selected: English 🇬🇧"));
+      }
+    }
+
+    function updateLangUI(lang) {
+      const badge = document.getElementById('active-lang-badge');
+      const flag = document.getElementById('active-lang-flag');
+      const arrow = document.getElementById('lang-dropdown-arrow');
+      const flags = { 'en': '🇬🇧', 'uz': '🇺🇿', 'ru': '🇷🇺' };
+      
+      if (badge) badge.textContent = lang.toUpperCase();
+      if (flag) flag.textContent = flags[lang] || '🌐';
+      if (arrow) arrow.classList.remove('rotate-180');
+
+      ['uz', 'en', 'ru'].forEach(l => {
+        const opt = document.getElementById('lang-opt-' + l);
+        const check = document.getElementById('lang-check-' + l);
+        if (opt) {
+          if (l === lang) {
+            opt.classList.add('bg-neutral-100', 'font-black');
+            if (check) check.classList.remove('hidden');
+          } else {
+            opt.classList.remove('bg-neutral-100', 'font-black');
+            if (check) check.classList.add('hidden');
+          }
+        }
+        document.querySelectorAll('.mobile-lang-btn').forEach(btn => {
+          if (btn.dataset.lang === l) {
+            if (l === lang) {
+              btn.classList.add('bg-black', 'text-white');
+              btn.classList.remove('text-neutral-800');
+            } else {
+              btn.classList.remove('bg-black', 'text-white');
+              btn.classList.add('text-neutral-800');
+            }
+          }
+        });
+      });
+    }
+
+    // Close dropdown on click outside
+    document.addEventListener('click', function(e) {
+      const wrapper = document.getElementById('lang-switcher-wrapper');
+      const dropdown = document.getElementById('lang-dropdown-menu');
+      const arrow = document.getElementById('lang-dropdown-arrow');
+      if (dropdown && !dropdown.classList.contains('hidden')) {
+        if (wrapper && !wrapper.contains(e.target)) {
+          dropdown.classList.add('hidden');
+          if (arrow) arrow.classList.remove('rotate-180');
+        }
+      }
+    });
+
+    // Initialize application
+    function initApp() {
+      const activeLang = getCurrentLang();
+      updateLangUI(activeLang);
+      applyTranslations(activeLang);
+
+      const sections = document.querySelectorAll('section[id], main[id]');
+      const navLinks = {
+        'home': document.getElementById('nav-home'),
+        'about': document.getElementById('nav-about'),
+        'experience': document.getElementById('nav-experience'),
+        'projects': document.getElementById('nav-projects'),
+        'services': document.getElementById('nav-services')
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const id = entry.target.getAttribute('id');
+            Object.keys(navLinks).forEach(k => {
+              if (navLinks[k]) {
+                if (k === id) {
+                  navLinks[k].classList.add('border-neutral-300', 'text-black');
+                  navLinks[k].classList.remove('border-transparent', 'text-neutral-600');
+                } else {
+                  navLinks[k].classList.remove('border-neutral-300', 'text-black');
+                  navLinks[k].classList.add('border-transparent', 'text-neutral-600');
+                }
+              }
+            });
+          }
+        });
+      }, { rootMargin: '-20% 0px -60% 0px' });
+
+      sections.forEach(s => observer.observe(s));
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initApp);
+    } else {
+      initApp();
+    }
+  </script>
+
+  <script>
+    window.DJANGO_WORKS = {{ mini_projects_json|default:works_json|safe }};
+    window.DJANGO_ITEMS = {{ featured_projects_json|default:items_json|safe }};
+  </script>
+
+  <!-- FlexCarousel Initialization (React Bits Component Engine) -->
+  <script type="module">
+    import { initFlexCarousel, DEFAULT_ITEMS } from './flex-carousel.js';
+
+    function startCarousel() {
+      const container = document.getElementById('flex-carousel-container');
+      if (container) {
+        const carouselItems = (window.DJANGO_ITEMS && window.DJANGO_ITEMS.length) ? window.DJANGO_ITEMS : DEFAULT_ITEMS;
+        window.flexCarouselInstance = initFlexCarousel(container, {
+          items: carouselItems,
+          preset: 'liquid',
+          intro: 'rise',
+          cardHeight: 0.5,
+          gap: 12,
+          squeeze: 0.2,
+          focusOnClick: true,
+          captions: true,
+          onSelect: (index, item) => {
+            if (window.openProjectModal) {
+              window.openProjectModal(item);
+            }
+          }
+        });
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', startCarousel);
+    } else {
+      startCarousel();
+    }
+  </script>
+
+  <!-- WorksWheel 3D Drum Reel Initialization -->
+  <script type="module">
+    import { initWorksWheel, DEFAULT_WORKS } from './works-wheel.js';
+
+    function startWorksWheel() {
+      const container = document.getElementById('works-wheel-container');
+      if (container) {
+        const wheelItems = (window.DJANGO_WORKS && window.DJANGO_WORKS.length) ? window.DJANGO_WORKS : DEFAULT_WORKS;
+        const wheelInstance = initWorksWheel(container, {
+          items: wheelItems,
+          label: "Mini '26",
+          action: "View",
+          onSelect: (index, item) => {
+            if (window.openProjectModal) {
+              window.openProjectModal(item);
+            }
+          }
+        });
+        window.worksWheelInstance = wheelInstance;
+
+        const prevBtn = document.getElementById('works-wheel-prev-btn');
+        const nextBtn = document.getElementById('works-wheel-next-btn');
+        if (prevBtn) prevBtn.addEventListener('click', () => wheelInstance.prev());
+        if (nextBtn) nextBtn.addEventListener('click', () => wheelInstance.next());
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', startWorksWheel);
+    } else {
+      startWorksWheel();
+    }
+  </script>
+  <script type="module" src="./scroll-expand-media.js"></script>
+  <script type="module" src="./experience-section.js"></script>
+  <!-- Service Worker Registration for Offline Caching & Instant Page Loads -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((reg) => console.log('[SW] Registered successfully, scope:', reg.scope))
+          .catch((err) => console.warn('[SW] Registration failed:', err));
+      });
+    }
+  </script>
+</body>
 </html>

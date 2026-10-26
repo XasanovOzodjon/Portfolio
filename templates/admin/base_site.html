@@ -1,0 +1,338 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}EGO Control Center{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #ffffff;
+    --primary-fg: #000000;
+    --accent: #22c55e;
+    --body-bg: #0a0a0a;
+    --surface-bg: #141414;
+    --surface-card: #161616;
+    --border-color: #242424;
+    --border-subtle: #1e1e1e;
+    --text-primary: #f8fafc;
+    --text-muted: #94a3b8;
+  }
+
+  /* Global dark theme overrides */
+  html, body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    background: #0a0a0a !important;
+    color: #f1f5f9 !important;
+  }
+
+  #container {
+    background: #0a0a0a !important;
+  }
+
+  #header {
+    background: #000000 !important;
+    color: #ffffff !important;
+    padding: 16px 32px !important;
+    border-bottom: 1px solid #222222 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+
+  #branding h1 {
+    font-size: 18px !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.02em !important;
+    margin: 0 !important;
+  }
+
+  #branding h1 a:link, #branding h1 a:visited {
+    color: #ffffff !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    text-decoration: none !important;
+  }
+
+  .branding-tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 3px 8px;
+    background: #142918;
+    border: 1px solid #166534;
+    color: #4ade80;
+    border-radius: 9999px;
+    text-transform: uppercase;
+  }
+
+  #user-tools {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: #94a3b8 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+  }
+
+  #user-tools a {
+    color: #f1f5f9 !important;
+    text-decoration: none !important;
+    padding: 6px 14px !important;
+    border-radius: 9999px !important;
+    border: 1px solid #2a2a2a !important;
+    background: #161616 !important;
+    transition: all 0.2s ease !important;
+  }
+
+  #user-tools a:hover {
+    background: #262626 !important;
+    border-color: #444444 !important;
+  }
+
+  .btn-live-site {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-weight: 800 !important;
+    border: none !important;
+  }
+  .btn-live-site:hover {
+    background: #e2e8f0 !important;
+    color: #000000 !important;
+  }
+
+  div.breadcrumbs {
+    background: #0f0f0f !important;
+    border-bottom: 1px solid #1f1f1f !important;
+    padding: 12px 32px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: #64748b !important;
+  }
+
+  div.breadcrumbs a {
+    color: #e2e8f0 !important;
+    text-decoration: none !important;
+  }
+
+  #content {
+    padding: 32px !important;
+    background: #0a0a0a !important;
+  }
+
+  #content-main {
+    background: transparent !important;
+  }
+
+  /* Tables & Lists in Dark Theme */
+  #changelist {
+    background: transparent !important;
+  }
+
+  #changelist table {
+    border-radius: 16px !important;
+    overflow: hidden !important;
+    border: 1px solid #222222 !important;
+    background: #141414 !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4) !important;
+  }
+
+  #changelist table thead th {
+    background: #181818 !important;
+    color: #94a3b8 !important;
+    font-weight: 700 !important;
+    font-size: 11px !important;
+    letter-spacing: 0.05em !important;
+    text-transform: uppercase !important;
+    border-bottom: 1px solid #242424 !important;
+    padding: 14px 18px !important;
+  }
+
+  #changelist table thead th a {
+    color: #e2e8f0 !important;
+  }
+
+  #changelist table tbody tr td, #changelist table tbody tr th {
+    padding: 14px 18px !important;
+    border-bottom: 1px solid #1e1e1e !important;
+    font-size: 13px !important;
+    color: #f1f5f9 !important;
+    background: #141414 !important;
+  }
+
+  #changelist table tbody tr:hover td, #changelist table tbody tr:hover th {
+    background: #1a1a1a !important;
+  }
+
+  #changelist table tbody tr th a {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+  }
+
+  #changelist-filter {
+    background: #141414 !important;
+    border: 1px solid #242424 !important;
+    border-radius: 16px !important;
+  }
+
+  #changelist-filter h2 {
+    background: #181818 !important;
+    color: #ffffff !important;
+    border-bottom: 1px solid #242424 !important;
+  }
+
+  #changelist-filter li a {
+    color: #94a3b8 !important;
+  }
+  #changelist-filter li.selected a {
+    color: #ffffff !important;
+    font-weight: 800 !important;
+  }
+
+  /* Form controls in Dark Theme */
+  input[type="text"], input[type="password"], input[type="email"], input[type="url"], input[type="number"], textarea, select {
+    background: #181818 !important;
+    border-radius: 10px !important;
+    border: 1px solid #2e2e2e !important;
+    color: #ffffff !important;
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+    font-family: inherit !important;
+    transition: all 0.2s ease !important;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    border-color: #555555 !important;
+    background: #1e1e1e !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.08) !important;
+  }
+
+  .button, input[type=submit], input[type=button], .submit-row input, a.button {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-weight: 800 !important;
+    font-size: 12px !important;
+    letter-spacing: 0.03em !important;
+    border-radius: 9999px !important;
+    padding: 10px 20px !important;
+    border: none !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+  }
+
+  .button:hover, input[type=submit]:hover, .submit-row input:hover {
+    background: #e2e8f0 !important;
+    transform: translateY(-1px);
+  }
+
+  .button.default, input[type=submit].default {
+    background: #22c55e !important;
+    color: #000000 !important;
+  }
+  .button.default:hover, input[type=submit].default:hover {
+    background: #16a34a !important;
+  }
+
+  .deletelink {
+    background: #7f1d1d !important;
+    color: #fca5a5 !important;
+    border-radius: 9999px !important;
+    padding: 8px 16px !important;
+  }
+
+  .module {
+    background: #141414 !important;
+    border: 1px solid #242424 !important;
+    border-radius: 18px !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3) !important;
+    margin-bottom: 24px !important;
+    overflow: hidden !important;
+  }
+
+  .module h2 {
+    background: #181818 !important;
+    color: #ffffff !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.05em !important;
+    text-transform: uppercase !important;
+    padding: 16px 22px !important;
+    border-bottom: 1px solid #242424 !important;
+  }
+
+  .module caption {
+    background: #181818 !important;
+    color: #ffffff !important;
+    border-bottom: 1px solid #242424 !important;
+  }
+
+  .module caption a {
+    color: #ffffff !important;
+  }
+
+  .form-row {
+    border-bottom: 1px solid #1f1f1f !important;
+    padding: 16px 20px !important;
+  }
+
+  .form-row label {
+    color: #cbd5e1 !important;
+    font-weight: 600 !important;
+  }
+
+  .help, p.help {
+    color: #94a3b8 !important;
+    font-size: 12px !important;
+  }
+
+  .submit-row {
+    background: #141414 !important;
+    border: 1px solid #242424 !important;
+    border-radius: 16px !important;
+    padding: 16px 20px !important;
+  }
+
+  /* Selection actions bar */
+  .actions {
+    background: #141414 !important;
+    border: 1px solid #242424 !important;
+    border-radius: 12px !important;
+    padding: 10px 16px !important;
+    color: #cbd5e1 !important;
+  }
+
+  .actions select {
+    background: #1e1e1e !important;
+    color: #ffffff !important;
+  }
+
+  /* Django messages */
+  ul.messagelist li.success {
+    background: #142918 !important;
+    color: #4ade80 !important;
+    border: 1px solid #166534 !important;
+    border-radius: 12px !important;
+  }
+</style>
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+  <a href="{% url 'admin:index' %}">
+    <span>EGO</span>
+    <span class="branding-tag">STUDIO CONTROL</span>
+  </a>
+</h1>
+{% endblock %}
+
+{% block userlinks %}
+  <a href="/" target="_blank" class="btn-live-site">
+    <span>🌐 Jonli Sayt</span>
+  </a>
+  {{ block.super }}
+{% endblock %}
