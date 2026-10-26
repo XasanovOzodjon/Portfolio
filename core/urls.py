@@ -15,13 +15,17 @@ urlpatterns = [
     path('contact/', api_contact, name='contact'),
 ]
 
-# Statik va media fayllarga to'g'ridan-to'g'ri xizmat ko'rsatish (Nginx va lokal fallback uchun)
+# Media fayllarga xizmat ko'rsatish (Nginx va lokal fallback uchun)
+urlpatterns += [
+    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+]
+
+# Statik fayllarga to'g'ridan-to'g'ri xizmat ko'rsatish (Nginx va lokal fallback uchun)
 static_dir = settings.STATIC_ROOT if (hasattr(settings, 'STATIC_ROOT') and settings.STATIC_ROOT and os.path.exists(settings.STATIC_ROOT)) else settings.STATICFILES_DIRS[0]
 urlpatterns += [
-    re_path(r'^(?P<path>.*\.(?:js|mjs|css|png|jpg|jpeg|webp|svg|gif|woff|woff2|ttf|ico|glb|gltf|mp4|webm|json))$', 
+    re_path(r'^(?!(?:media|admin|api)/)(?P<path>.*\.(?:js|mjs|css|png|jpg|jpeg|webp|svg|gif|woff|woff2|ttf|ico|glb|gltf|mp4|webm|json))$', 
             serve, {'document_root': static_dir}),
     re_path(r'^(?P<path>(?:assets|Landing Page Assest|Project Images|admin|modeltranslation)/.*)$', 
             serve, {'document_root': static_dir}),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=static_dir)
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
