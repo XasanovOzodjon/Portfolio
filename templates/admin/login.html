@@ -1,0 +1,148 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block bodyclass %}{{ block.super }} login{% endblock %}
+
+{% block usertools %}{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block nav-breadcrumbs %}{% endblock %}
+
+{% block content_title %}{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+  .login-wrapper {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .login-card {
+    background: #141414;
+    border: 1px solid #282828;
+    border-radius: 24px;
+    padding: 40px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+  }
+
+  .login-header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+
+  .login-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 22px;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 8px;
+  }
+
+  .login-subtitle {
+    font-size: 13px;
+    color: #94a3b8;
+    margin: 0;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #cbd5e1;
+    margin-bottom: 8px;
+  }
+
+  .form-group input {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .btn-submit {
+    width: 100%;
+    padding: 12px !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-weight: 800 !important;
+    font-size: 13px !important;
+    border-radius: 9999px !important;
+    margin-top: 10px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+  }
+
+  .btn-submit:hover {
+    background: #e2e8f0 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255,255,255,0.2);
+  }
+
+  .errornote {
+    background: #2a1215 !important;
+    border: 1px solid #7f1d1d !important;
+    color: #fca5a5 !important;
+    border-radius: 12px !important;
+    padding: 12px !important;
+    font-size: 13px !important;
+    margin-bottom: 20px !important;
+    text-align: center;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="login-logo">
+        <span>EGO</span>
+        <span class="branding-tag">STUDIO</span>
+      </div>
+      <p class="login-subtitle">Boshqaruv paneliga kirish</p>
+    </div>
+
+    {% if form.errors and not form.non_field_errors %}
+      <p class="errornote">Login yoki parol noto'g'ri kiritildi.</p>
+    {% endif %}
+
+    {% if form.non_field_errors %}
+      {% for error in form.non_field_errors %}
+        <p class="errornote">{{ error }}</p>
+      {% endfor %}
+    {% endif %}
+
+    <form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
+      <div class="form-group">
+        <label for="id_username">Login (Username)</label>
+        <input type="text" name="username" autofocus autocapitalize="none" autocomplete="username" maxlength="150" required id="id_username" placeholder="ozodjon">
+      </div>
+
+      <div class="form-group">
+        <label for="id_password">Parol</label>
+        <input type="password" name="password" autocomplete="current-password" required id="id_password" placeholder="••••••••">
+      </div>
+
+      <input type="hidden" name="next" value="{{ next }}">
+
+      <button type="submit" class="btn-submit">
+        Tizimga kirish →
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

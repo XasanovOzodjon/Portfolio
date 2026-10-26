@@ -1,133 +1,163 @@
-"""
-Django admin configuration for the main application.
-
-This module contains all the admin configurations for managing
-portfolio data through the Django admin interface.
-"""
-
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from modeltranslation.admin import TabbedTranslationAdmin, TranslationAdmin
 
 from .models import (
     User,
     Skill,
     Project,
+    MiniProject,
     KeyAchievement,
+    Experience,
     ImpactAndAchievementsGlobal,
     ImpactAndAchievements,
     MaAItem,
+    ContactMessage,
+    Service,
+    Button,
+    OriginFoundation,
+    ExperienceChapter
 )
 
 
 class KeyAchievementInline(admin.TabularInline):
-    """Inline admin for Key Achievements within Project admin."""
-    
     model = KeyAchievement
     extra = 1
     fields = ('title',)
-    verbose_name = "Key Achievement"
-    verbose_name_plural = "Key Achievements"
 
 
 class MaAItemInline(admin.TabularInline):
-    """Inline admin for MaA Items within Impact and Achievements admin."""
-    
     model = MaAItem
     extra = 1
     fields = ('title',)
-    verbose_name = "Achievement Item"
-    verbose_name_plural = "Achievement Items"
 
 
 class ImpactAndAchievementsInline(admin.TabularInline):
-    """Inline admin for Impact and Achievements within Global Impact admin."""
-    
     model = ImpactAndAchievements
     extra = 1
     fields = ('title',)
-    verbose_name = "Achievement Category"
-    verbose_name_plural = "Achievement Categories"
 
-class ProjectAdmin(admin.ModelAdmin):
-    """Admin configuration for Project model."""
-    
+
+@admin.register(Project)
+class ProjectAdmin(TabbedTranslationAdmin):
     inlines = [KeyAchievementInline]
-    list_display = ('title', 'description', 'link')
-    search_fields = ('title', 'description')
+    list_display = ('title', 'subtitle', 'link', 'is_github_private', 'is_featured', 'order')
+    list_editable = ('is_github_private', 'is_featured', 'order')
+    search_fields = ('title', 'subtitle', 'description')
     filter_horizontal = ('skills',)
-    fieldsets = (
-        ('Project Information', {
-            'fields': ('title', 'description', 'link')
-        }),
-        ('Skills Used', {
-            'fields': ('skills',)
-        }),
-    )
 
 
+@admin.register(MiniProject)
+class MiniProjectAdmin(TabbedTranslationAdmin):
+    list_display = ('order', 'title', 'subtitle', 'is_github_private', 'is_active')
+    list_display_links = ('title',)
+    list_editable = ('order', 'is_github_private', 'is_active')
+    search_fields = ('title', 'subtitle', 'description', 'deliverables')
+    filter_horizontal = ('skills',)
+    list_filter = ('is_active', 'is_github_private')
+
+
+@admin.register(Experience)
+class ExperienceAdmin(admin.ModelAdmin):
+    list_display = ('role', 'company', 'period', 'location', 'order')
+    list_editable = ('order',)
+    search_fields = ('role', 'company', 'description')
+
+
+@admin.register(Skill)
+class SkillAdmin(admin.ModelAdmin):
+    list_display = ('name', 'category', 'is_featured_in_about')
+    list_editable = ('is_featured_in_about',)
+    search_fields = ('name', 'category')
+    list_filter = ('category', 'is_featured_in_about')
+
+
+@admin.register(Button)
+class ButtonAdmin(TabbedTranslationAdmin):
+    list_display = ('order', 'title', 'link', 'is_active')
+    list_display_links = ('title',)
+    list_editable = ('order', 'is_active')
+    search_fields = ('title', 'link')
+    list_filter = ('is_active',)
+
+
+@admin.register(OriginFoundation)
+class OriginFoundationAdmin(TabbedTranslationAdmin):
+    list_display = ('badge', 'title', 'hud_phase')
+    search_fields = ('badge', 'title', 'description')
+
+
+@admin.register(ExperienceChapter)
+class ExperienceChapterAdmin(TabbedTranslationAdmin):
+    list_display = ('order', 'eyebrow', 'date_range', 'button_label')
+    list_display_links = ('eyebrow',)
+    list_editable = ('order',)
+    search_fields = ('eyebrow', 'role_title', 'description')
+
+
+@admin.register(ImpactAndAchievementsGlobal)
 class ImpactAndAchievementsGlobalAdmin(admin.ModelAdmin):
-    """Admin configuration for Global Impact and Achievements model."""
-    
     inlines = [ImpactAndAchievementsInline]
     list_display = ('title',)
     search_fields = ('title',)
-    fieldsets = (
-        ('Global Impact Information', {
-            'fields': ('title',)
-        }),
-    )
 
 
+@admin.register(ImpactAndAchievements)
 class ImpactAndAchievementsAdmin(admin.ModelAdmin):
-    """Admin configuration for Impact and Achievements model."""
-    
     inlines = [MaAItemInline]
     list_display = ('title', 'global_impact')
-    search_fields = ('title',)
     list_filter = ('global_impact',)
-    fieldsets = (
-        ('Achievement Information', {
-            'fields': ('title', 'global_impact')
-        }),
-    )
 
 
-class MaAItemAdmin(admin.ModelAdmin):
-    """Admin configuration for MaA Item model."""
-    
-    list_display = ('title', 'maa')
-    search_fields = ('title',)
-    list_filter = ('maa',)
-    fieldsets = (
-        ('Item Information', {
-            'fields': ('title', 'maa')
-        }),
-    )
-
-class SkillAdmin(admin.ModelAdmin):
-    """Admin configuration for Skill model."""
-    
-    list_display = ('name',)
-    search_fields = ('name',)
-    ordering = ('name',)
+@admin.register(Service)
+class ServiceAdmin(TabbedTranslationAdmin):
+    list_display = ('order', 'title', 'deliverables', 'is_active')
+    list_display_links = ('title',)
+    list_editable = ('order', 'is_active')
+    search_fields = ('title', 'description', 'deliverables')
+    list_filter = ('is_active',)
 
 
+@admin.register(ContactMessage)
+class ContactMessageAdmin(admin.ModelAdmin):
+    list_display = ('name', 'email', 'created_at', 'is_sent_to_telegram')
+    list_filter = ('is_sent_to_telegram', 'created_at')
+    search_fields = ('name', 'email', 'message')
+    readonly_fields = ('name', 'email', 'message', 'source', 'is_sent_to_telegram', 'created_at')
+
+
+@admin.register(User)
 class UserAdmin(BaseUserAdmin):
-    """Extended admin configuration for User model."""
-    
     model = User
     fieldsets = BaseUserAdmin.fieldsets + (
-        ('Professional Information', {
+        ('Portfolio Profile & About Me (O\'zbekcha)', {
             'fields': (
-                'professional_title',
-                'adress',
+                'professional_title_uz',
+                'address1_uz',
+                'address2_uz',
+                'bio_uz',
+                'about_tagline_uz',
+                'about_statement_uz',
             )
         }),
-        ('Social Media', {
+        ('Portfolio Profile & About Me (English)', {
             'fields': (
-                'github_username',
-                'instagram_username',
-                'telegram_username',
+                'professional_title_en',
+                'address1_en',
+                'address2_en',
+                'bio_en',
+                'about_tagline_en',
+                'about_statement_en',
+            )
+        }),
+        ('Portfolio Profile & About Me (Русский)', {
+            'fields': (
+                'professional_title_ru',
+                'address1_ru',
+                'address2_ru',
+                'bio_ru',
+                'about_tagline_ru',
+                'about_statement_ru',
             )
         }),
         ('Skills', {
@@ -135,21 +165,4 @@ class UserAdmin(BaseUserAdmin):
         }),
     )
     filter_horizontal = ('skills',)
-    list_display = (
-        'username',
-        'email',
-        'first_name',
-        'last_name',
-        'professional_title'
-    )
-    search_fields = ('username', 'email', 'first_name', 'last_name')
-
-
-# Register all models with their respective admin classes
-admin.site.register(User, UserAdmin)
-admin.site.register(Skill, SkillAdmin)
-admin.site.register(Project, ProjectAdmin)
-admin.site.register(ImpactAndAchievementsGlobal, ImpactAndAchievementsGlobalAdmin)
-admin.site.register(ImpactAndAchievements, ImpactAndAchievementsAdmin)
-# admin.site.register(MaAItem, MaAItemAdmin)
-admin.site.register(KeyAchievement)
+    list_display = ('username', 'first_name', 'last_name', 'professional_title', 'address1', 'address2', 'is_staff')

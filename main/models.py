@@ -1,18 +1,15 @@
-"""
-Portfolio models for Django application.
-
-This module contains models for user management, projects, skills,
-and impact achievements tracking.
-"""
-
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
 class Skill(models.Model):
     """Model for representing technical skills."""
-    
     name = models.CharField(max_length=50, unique=True)
+    category = models.CharField(max_length=50, default='Backend', blank=True)
+    is_featured_in_about = models.BooleanField(
+        default=False, 
+        help_text="About me bo'limidagi (DISCIPLINE & CRAFT) qatorida ko'rsatilsinmi?"
+    )
 
     class Meta:
         ordering = ['name']
@@ -24,32 +21,39 @@ class Skill(models.Model):
 
 
 class User(AbstractUser):
-    """Extended user model with additional portfolio information."""
-    
+    """Extended user model with portfolio information."""
     professional_title = models.CharField(
-        max_length=100, 
+        max_length=150, 
         blank=True,
+        default='Editorial Developer & Backend Architect',
         help_text='Professional title or job position'
     )
-    adress = models.CharField(
-        max_length=255, 
+    address1 = models.CharField(
+        max_length=100, 
         blank=True,
-        help_text='Current location address'
+        default='FROM UZBEKISTAN',
+        help_text='Manzil 1 (masalan: FROM UZBEKISTAN)'
     )
-    github_username = models.CharField(
-        max_length=39, 
+    address2 = models.CharField(
+        max_length=100, 
         blank=True,
-        help_text='GitHub username (without @)'
+        default='TASHKENT',
+        help_text='Manzil 2 (masalan: TASHKENT)'
     )
-    instagram_username = models.CharField(
-        max_length=30, 
+    bio = models.TextField(
         blank=True,
-        help_text='Instagram username (without @)'
+        default='PASSIONATE ABOUT SCALABLE ARCHITECTURES, HIGH-PERFORMANCE APIS AND IMMERSIVE DIGITAL SYSTEMS.'
     )
-    telegram_username = models.CharField(
-        max_length=32, 
+    about_tagline = models.CharField(
+        max_length=255,
         blank=True,
-        help_text='Telegram username (without @)'
+        default='TURNING VISIONARY IDEAS INTO FAST, DISTINCTIVE DIGITAL EXPERIENCES',
+        help_text="About me qismidagi yuqori sarlavha"
+    )
+    about_statement = models.TextField(
+        blank=True,
+        default='I SPECIALIZE IN BUILDING BESPOKE DIGITAL PRODUCTS WHERE PURPOSEFUL EDITORIAL DESIGN MEETS ROBUST ENGINEERING. CREATING EXPERIENCES WITH INTENTIONAL MOTION, SYSTEMATIC RIGOR, AND MEASURABLE IMPACT.',
+        help_text="About me qismidagi asosiy falsafa/bayonot matni"
     )
     skills = models.ManyToManyField(
         'Skill', 
@@ -67,23 +71,24 @@ class User(AbstractUser):
 
 class Project(models.Model):
     """Model for representing portfolio projects."""
-    
-    title = models.CharField(max_length=100)
-    description = models.TextField(
-        help_text='Detailed project description'
-    )
-    link = models.URLField(
-        blank=True,
-        help_text='Project URL or repository link'
-    )
+    title = models.CharField(max_length=120)
+    subtitle = models.CharField(max_length=150, blank=True, default='Mobile & Backend Architecture')
+    description = models.TextField(help_text='Detailed project description')
+    link = models.URLField(blank=True, help_text='Live project URL')
+    github_link = models.URLField(blank=True, help_text='GitHub repository URL')
+    image = models.CharField(max_length=255, blank=True, default='Project Images/Portfolio Website.png')
+    stats = models.CharField(max_length=200, blank=True, default='High Concurrency • Clean Architecture • REST API')
     skills = models.ManyToManyField(
         'Skill', 
         blank=True,
         help_text='Technologies used in this project'
     )
+    is_featured = models.BooleanField(default=True)
+    is_github_private = models.BooleanField(default=False, help_text="GitHub yopiq (Private) bo'lsa belgilang — qulfcha belgisi chiqadi")
+    order = models.PositiveIntegerField(default=0)
 
     class Meta:
-        ordering = ['-id']
+        ordering = ['order', '-id']
         verbose_name = 'Project'
         verbose_name_plural = 'Projects'
 
@@ -93,7 +98,6 @@ class Project(models.Model):
 
 class KeyAchievement(models.Model):
     """Model for representing project key achievements."""
-    
     project = models.ForeignKey(
         Project, 
         on_delete=models.CASCADE, 
@@ -110,9 +114,64 @@ class KeyAchievement(models.Model):
         return f"{self.project.title} - {self.title}"
 
 
+class MiniProject(models.Model):
+    """Model for representing Mini Projects (formerly Landing Pages WorksWheel)."""
+    title = models.CharField(max_length=120)
+    subtitle = models.CharField(max_length=150, blank=True, default='Interactive Frontend & Micro-Experience')
+    description = models.TextField(help_text='Batafsil tavsif')
+    link = models.URLField(blank=True, help_text='Jonli demo havolasi')
+    github_link = models.URLField(blank=True, help_text='GitHub repo havolasi')
+    image = models.CharField(
+        max_length=255, 
+        blank=True, 
+        default='Landing Page Assest/Screenshot 2026-10-20 at 7.46.25 PM.png',
+        help_text='Rasm fayli (masalan: Landing Page Assest/Screenshot...)'
+    )
+    stats = models.CharField(max_length=200, blank=True, default='WebGL • Interactive Motion • High Performance')
+    deliverables = models.CharField(max_length=255, blank=True, default='Interactive UI • Micro-Animations • Responsive Layout')
+    skills = models.ManyToManyField(
+        'Skill', 
+        blank=True,
+        help_text='Mini loyihada ishlatilgan texnologiyalar'
+    )
+    is_github_private = models.BooleanField(default=False, help_text="GitHub yopiq (Private) bo'lsa belgilang — qulfcha chiqadi")
+    order = models.PositiveIntegerField(default=1)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['order', 'id']
+        verbose_name = 'Mini Project'
+        verbose_name_plural = 'Mini Projects'
+
+    def __str__(self):
+        return f"{self.order}. {self.title}"
+
+
+class Experience(models.Model):
+    """Model for experience section items in horizontal stage."""
+    period = models.CharField(max_length=80, default='2024 — PRESENT')
+    role = models.CharField(max_length=120, default='Lead Backend Engineer')
+    company = models.CharField(max_length=120, default='Independent Architecture')
+    location = models.CharField(max_length=100, default='Tashkent, UZ')
+    description = models.TextField()
+    deliverables = models.CharField(
+        max_length=255, 
+        blank=True, 
+        default='Microservices • Telegram Bot Ecosystem • Database Optimization'
+    )
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order', 'id']
+        verbose_name = 'Experience'
+        verbose_name_plural = 'Experiences'
+
+    def __str__(self):
+        return f"{self.role} @ {self.company} ({self.period})"
+
+
 class ImpactAndAchievementsGlobal(models.Model):
     """Model for global impact and achievements categories."""
-    
     title = models.CharField(max_length=128)
 
     class Meta:
@@ -126,7 +185,6 @@ class ImpactAndAchievementsGlobal(models.Model):
 
 class ImpactAndAchievements(models.Model):
     """Model for specific impact and achievement areas."""
-    
     global_impact = models.ForeignKey(
         ImpactAndAchievementsGlobal, 
         on_delete=models.CASCADE, 
@@ -145,7 +203,6 @@ class ImpactAndAchievements(models.Model):
 
 class MaAItem(models.Model):
     """Model for individual impact and achievement items."""
-    
     maa = models.ForeignKey(
         ImpactAndAchievements, 
         on_delete=models.CASCADE, 
@@ -160,3 +217,96 @@ class MaAItem(models.Model):
 
     def __str__(self):
         return f"{self.maa.title} - {self.title}"
+
+
+class ContactMessage(models.Model):
+    """Model for storing submitted contact messages."""
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    message = models.TextField()
+    source = models.CharField(max_length=50, default='EGO Portfolio v2')
+    is_sent_to_telegram = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Contact Message'
+        verbose_name_plural = 'Contact Messages'
+
+    def __str__(self):
+        return f"{self.name} ({self.email}) - {self.created_at.strftime('%Y-%m-%d %H:%M')}"
+
+
+class Service(models.Model):
+    """Model for services displayed in the accordion on the portfolio."""
+    title = models.CharField(max_length=120, help_text="Xizmat nomi (masalan: UI/UX, WEB DESIGN, LANDING PAGE DESIGN)")
+    description = models.TextField(help_text="Xizmat haqida batafsil ma'lumot")
+    deliverables = models.CharField(max_length=255, help_text="DELIVERABLES (masalan: FULL RESPONSIVE WEB DESIGNS, FIGMA SYSTEM)")
+    order = models.PositiveIntegerField(default=1, help_text="Tartib raqami (1, 2, 3...)")
+    is_active = models.BooleanField(default=True, help_text="Saytda ko'rsatilsinmi?")
+
+    class Meta:
+        ordering = ['order', 'id']
+        verbose_name = 'Service'
+        verbose_name_plural = 'Services'
+
+    def __str__(self):
+        return f"{self.order}. {self.title}"
+
+
+class Button(models.Model):
+    """Model for custom action / social buttons (e.g. near CONTACT ME in footer)."""
+    title = models.CharField(max_length=60, help_text="Tugma ustidagi yozuv (masalan: TELEGRAM, GITHUB, LINKEDIN, TWITTER)")
+    link = models.URLField(help_text="Tugma bosilganda o'tadigan havola (URL)")
+    order = models.PositiveIntegerField(default=1, help_text="Tartib raqami (1, 2, 3...)")
+    is_active = models.BooleanField(default=True, help_text="Saytda ko'rinsinmi?")
+
+    class Meta:
+        ordering = ['order', 'id']
+        verbose_name = 'Button (Tugma)'
+        verbose_name_plural = 'Buttons (Tugmalar)'
+
+    def __str__(self):
+        return f"{self.order}. {self.title} ({self.link})"
+
+
+class OriginFoundation(models.Model):
+    """Model for ORIGIN & FOUNDATIONS section of the experience stage."""
+    badge = models.CharField(max_length=100, default='ORIGIN & FOUNDATIONS', help_text="Kichik tepa nishon matni")
+    title = models.CharField(max_length=120, default="WHERE<br>I'VE BEEN", help_text="Katta sarlavha (HTML <br> teglari bilan)")
+    description = models.TextField(default="My professional journey through different roles and environments.", help_text="Tavsif matni")
+    hud_phase = models.CharField(max_length=100, default="ORIGIN & FOUNDATIONS", help_text="Tepa HUD progress panelida chiqadigan faza nomi")
+
+    class Meta:
+        verbose_name = 'Origin & Foundation'
+        verbose_name_plural = 'Origin & Foundations'
+
+    def __str__(self):
+        return self.badge
+
+
+class ExperienceChapter(models.Model):
+    """Model for Experience stage chapters (e.g. SELF-DIRECTED LEARNING, FREELANCE)."""
+    chapter_id = models.CharField(max_length=50, default='learning', help_text="Texnik identifikator: 'learning' yoki 'freelance'")
+    button_label = models.CharField(max_length=50, default='LEARNING', help_text="Pastki status bardagi sakrash tugmasi matni (masalan: LEARNING, FREELANCE)")
+    date_range = models.CharField(max_length=60, default='2023 — 2025', help_text="Vaqt oralig'i (masalan: 2023 — 2025 yoki 2026 — PRESENT)")
+    eyebrow = models.CharField(max_length=120, default='SELF-DIRECTED LEARNING', help_text="Yuqori kichik sarlavha (masalan: SELF-DIRECTED LEARNING)")
+    badge = models.CharField(max_length=60, blank=True, default='', help_text="Ixtiyoriy kichik badge (masalan: COMMERCIAL yoki bo'sh qoldiring)")
+    role_title = models.CharField(max_length=150, default='CREATIVE<br>TECHNOLOGIST', help_text="Katta rol sarlavhasi (HTML <br> tegi bilan)")
+    description = models.TextField(default='Intensive self-education period exploring web technologies, creative coding, and modern development practices.')
+    
+    milestone_1_label = models.CharField(max_length=80, default='MILESTONE 01', help_text="1-bosqich yorlig'i")
+    milestone_1_text = models.CharField(max_length=255, default='Completed 500+ hours of hands-on development', help_text="1-bosqich matni")
+    milestone_2_label = models.CharField(max_length=80, default='MILESTONE 02', help_text="2-bosqich yorlig'i")
+    milestone_2_text = models.CharField(max_length=255, default='Mastered React, Node.js, and TypeScript ecosystem', help_text="2-bosqich matni")
+    milestone_3_label = models.CharField(max_length=80, default='MILESTONE 03', help_text="3-bosqich yorlig'i")
+    milestone_3_text = models.CharField(max_length=255, default='Built portfolio of 15+ production-ready projects', help_text="3-bosqich matni")
+    order = models.PositiveIntegerField(default=1, help_text="Tartib raqami (1: Learning, 2: Freelance)")
+
+    class Meta:
+        ordering = ['order', 'id']
+        verbose_name = 'Experience Chapter'
+        verbose_name_plural = 'Experience Chapters'
+
+    def __str__(self):
+        return f"{self.eyebrow} ({self.date_range})"
