@@ -1,5 +1,57 @@
+import io
+import os
+import uuid
+import logging
+from PIL import Image, ImageOps
+from django.conf import settings
+from django.core.files.base import ContentFile
+from django.utils.text import slugify
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+
+logger = logging.getLogger(__name__)
+
+
+def convert_uploaded_image_to_webp(image_field, folder='projects', max_size=(1920, 1920), quality=85):
+    """
+    Yangi yuklangan har qanday formatdagi (JPG, PNG, GIF, BMP, TIFF va h.k.) rasmni
+    avtomatik ravishda sifatli WebP formatiga o'tkazadi va optimal hajmda saqlaydi.
+    """
+    if not image_field:
+        return
+
+    # Faqat yangi yuklangan (hali fayl tizimiga yozilmagan) fayllar uchun
+    if hasattr(image_field, '_committed') and not image_field._committed:
+        try:
+            image_field.seek(0)
+            img = Image.open(image_field)
+
+            # EXIF orientatsiyasini to'g'irlash
+            img = ImageOps.exif_transpose(img)
+
+            # Rang modellarini to'g'ri moslashtirish (shaffoflik bo'lsa RGBA, bo'lmasa RGB)
+            if img.mode in ('RGBA', 'LA') or (img.mode == 'P' and 'transparency' in img.info):
+                img = img.convert('RGBA')
+            else:
+                img = img.convert('RGB')
+
+            # O'lchamni chegaralash (1920px dan katta bo'lsa proporsional kichraytirish)
+            img.thumbnail(max_size, Image.Resampling.LANCZOS)
+
+            # WebP formatida xotiraga yozish
+            output = io.BytesIO()
+            img.save(output, format='WEBP', quality=quality, method=6)
+            output.seek(0)
+
+            # Fayl nomini tozalash va WebP kengaytmasi berish
+            orig_filename = os.path.basename(getattr(image_field, 'name', '') or 'image')
+            base_name, _ = os.path.splitext(orig_filename)
+            clean_slug = slugify(base_name) or 'project_img'
+            unique_filename = f"{clean_slug}_{uuid.uuid4().hex[:8]}.webp"
+
+            image_field.save(unique_filename, ContentFile(output.getvalue()), save=False)
+        except Exception as e:
+            logger.warning(f"Rasm WebP formatiga o'tkazilmadi ({e}), asl nusxa saqlanadi.")
 
 
 class Skill(models.Model):
@@ -76,7 +128,13 @@ class Project(models.Model):
     description = models.TextField(help_text='Detailed project description')
     link = models.URLField(blank=True, help_text='Live project URL')
     github_link = models.URLField(blank=True, help_text='GitHub repository URL')
-    image = models.CharField(max_length=255, blank=True, default='Project Images/Portfolio Website.png')
+    image = models.ImageField(
+        upload_to='projects/',
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="Loyiha rasmi (istalgan format: JPG, PNG, WebP yuklashingiz mumkin, avtomatik WebP qilinadi)"
+    )
     stats = models.CharField(max_length=200, blank=True, default='High Concurrency • Clean Architecture • REST API')
     skills = models.ManyToManyField(
         'Skill', 
@@ -91,6 +149,24 @@ class Project(models.Model):
         ordering = ['order', '-id']
         verbose_name = 'Project'
         verbose_name_plural = 'Projects'
+
+    def save(self, *args, **kwargs):
+        convert_uploaded_image_to_webp(self.image, folder='projects')
+        super().save(*args, **kwargs)
+
+    @property
+    def image_url(self):
+        if not self.image:
+            return ""
+        name = str(self.image).strip()
+        if not name:
+            return ""
+        if name.startswith(('http://', 'https://', '/')):
+            return name
+        if name.startswith(('Project Images/', 'Landing Page Assest/', 'assets/')):
+            return f"/{name}"
+        media_url = getattr(settings, 'MEDIA_URL', '/media/').rstrip('/')
+        return f"{media_url}/{name.lstrip('/')}"
 
     def __str__(self):
         return self.title
@@ -121,11 +197,12 @@ class MiniProject(models.Model):
     description = models.TextField(help_text='Batafsil tavsif')
     link = models.URLField(blank=True, help_text='Jonli demo havolasi')
     github_link = models.URLField(blank=True, help_text='GitHub repo havolasi')
-    image = models.CharField(
-        max_length=255, 
-        blank=True, 
-        default='Landing Page Assest/Screenshot 2026-10-20 at 7.46.25 PM.png',
-        help_text='Rasm fayli (masalan: Landing Page Assest/Screenshot...)'
+    image = models.ImageField(
+        upload_to='mini_projects/',
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="Mini loyiha rasmi (istalgan format: JPG, PNG, WebP yuklashingiz mumkin, avtomatik WebP qilinadi)"
     )
     stats = models.CharField(max_length=200, blank=True, default='WebGL • Interactive Motion • High Performance')
     deliverables = models.CharField(max_length=255, blank=True, default='Interactive UI • Micro-Animations • Responsive Layout')
@@ -142,6 +219,24 @@ class MiniProject(models.Model):
         ordering = ['order', 'id']
         verbose_name = 'Mini Project'
         verbose_name_plural = 'Mini Projects'
+
+    def save(self, *args, **kwargs):
+        convert_uploaded_image_to_webp(self.image, folder='mini_projects')
+        super().save(*args, **kwargs)
+
+    @property
+    def image_url(self):
+        if not self.image:
+            return ""
+        name = str(self.image).strip()
+        if not name:
+            return ""
+        if name.startswith(('http://', 'https://', '/')):
+            return name
+        if name.startswith(('Project Images/', 'Landing Page Assest/', 'assets/')):
+            return f"/{name}"
+        media_url = getattr(settings, 'MEDIA_URL', '/media/').rstrip('/')
+        return f"{media_url}/{name.lstrip('/')}"
 
     def __str__(self):
         return f"{self.order}. {self.title}"

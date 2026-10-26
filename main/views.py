@@ -143,8 +143,8 @@ def get_portfolio_context():
             "title": mp.title,
             "subtitle": mp.subtitle or "Interactive Micro-Experience",
             "description": mp.description,
-            "image": mp.image or "Landing Page Assest/Screenshot 2026-10-20 at 7.46.25 PM.png",
-            "src": mp.image or "Landing Page Assest/Screenshot 2026-10-20 at 7.46.25 PM.png",
+            "image": mp.image_url or "Landing Page Assest/Screenshot 2026-10-20 at 7.46.25 PM.png",
+            "src": mp.image_url or "Landing Page Assest/Screenshot 2026-10-20 at 7.46.25 PM.png",
             "href": mp.link or f"#{mp.id}",
             "link": mp.link or "",
             "github_link": mp.github_link or "",
@@ -160,7 +160,8 @@ def get_portfolio_context():
         achievements = [a.title for a in p.key_achievements.all()]
         skill_names = [s.name for s in p.skills.all()]
         items_list.append({
-            "src": p.image or "Project Images/Portfolio Website.png",
+            "src": p.image_url or "Project Images/Portfolio Website.png",
+            "image": p.image_url or "Project Images/Portfolio Website.png",
             "alt": p.title,
             "title": p.title,
             "subtitle": p.subtitle or "System & Backend Architecture",
@@ -265,7 +266,7 @@ def api_portfolio_data(request: HttpRequest) -> JsonResponse:
                 "link": p.link,
                 "github_link": p.github_link,
                 "is_github_private": p.is_github_private,
-                "image": p.image,
+                "image": p.image_url,
                 "stats": p.stats,
                 "skills": [s.name for s in p.skills.all()],
                 "key_achievements": [a.title for a in p.key_achievements.all()],
@@ -281,7 +282,7 @@ def api_portfolio_data(request: HttpRequest) -> JsonResponse:
                 "link": mp.link,
                 "github_link": mp.github_link,
                 "is_github_private": mp.is_github_private,
-                "image": mp.image,
+                "image": mp.image_url,
                 "stats": mp.stats,
                 "deliverables": mp.deliverables,
                 "skills": [s.name for s in mp.skills.all()],

@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.utils.html import format_html
 from modeltranslation.admin import TabbedTranslationAdmin, TranslationAdmin
 
 from .models import (
@@ -41,20 +42,98 @@ class ImpactAndAchievementsInline(admin.TabularInline):
 @admin.register(Project)
 class ProjectAdmin(TabbedTranslationAdmin):
     inlines = [KeyAchievementInline]
-    list_display = ('title', 'subtitle', 'link', 'is_github_private', 'is_featured', 'order')
+    list_display = ('image_thumb', 'title', 'subtitle', 'link', 'is_github_private', 'is_featured', 'order')
+    list_display_links = ('image_thumb', 'title')
     list_editable = ('is_github_private', 'is_featured', 'order')
     search_fields = ('title', 'subtitle', 'description')
     filter_horizontal = ('skills',)
+    readonly_fields = ('image_preview_box',)
+    fields = (
+        'title',
+        'subtitle',
+        'description',
+        'link',
+        'github_link',
+        'is_github_private',
+        'is_featured',
+        'order',
+        'image',
+        'image_preview_box',
+        'stats',
+        'skills'
+    )
+
+    def image_thumb(self, obj):
+        url = obj.image_url
+        if url:
+            return format_html(
+                '<img src="{}" style="width: 48px; height: 32px; object-fit: cover; border-radius: 4px; border: 1px solid #444;" />',
+                url
+            )
+        return "—"
+    image_thumb.short_description = "Rasm"
+
+    def image_preview_box(self, obj):
+        url = obj.image_url
+        if url:
+            return format_html(
+                '<div style="margin-top: 6px;">'
+                '<img src="{}" style="max-width: 320px; max-height: 180px; object-fit: cover; border-radius: 8px; border: 1px solid #444;" /><br>'
+                '<span style="font-size: 11px; color: #888;">URL: {}</span>'
+                '</div>',
+                url, url
+            )
+        return "Rasm hali yuklanmagan"
+    image_preview_box.short_description = "Hozirgi rasm"
 
 
 @admin.register(MiniProject)
 class MiniProjectAdmin(TabbedTranslationAdmin):
-    list_display = ('order', 'title', 'subtitle', 'is_github_private', 'is_active')
-    list_display_links = ('title',)
+    list_display = ('image_thumb', 'order', 'title', 'subtitle', 'is_github_private', 'is_active')
+    list_display_links = ('image_thumb', 'title')
     list_editable = ('order', 'is_github_private', 'is_active')
     search_fields = ('title', 'subtitle', 'description', 'deliverables')
     filter_horizontal = ('skills',)
     list_filter = ('is_active', 'is_github_private')
+    readonly_fields = ('image_preview_box',)
+    fields = (
+        'order',
+        'title',
+        'subtitle',
+        'description',
+        'link',
+        'github_link',
+        'is_github_private',
+        'is_active',
+        'image',
+        'image_preview_box',
+        'stats',
+        'deliverables',
+        'skills'
+    )
+
+    def image_thumb(self, obj):
+        url = obj.image_url
+        if url:
+            return format_html(
+                '<img src="{}" style="width: 48px; height: 32px; object-fit: cover; border-radius: 4px; border: 1px solid #444;" />',
+                url
+            )
+        return "—"
+    image_thumb.short_description = "Rasm"
+
+    def image_preview_box(self, obj):
+        url = obj.image_url
+        if url:
+            return format_html(
+                '<div style="margin-top: 6px;">'
+                '<img src="{}" style="max-width: 320px; max-height: 180px; object-fit: cover; border-radius: 8px; border: 1px solid #444;" /><br>'
+                '<span style="font-size: 11px; color: #888;">URL: {}</span>'
+                '</div>',
+                url, url
+            )
+        return "Rasm hali yuklanmagan"
+    image_preview_box.short_description = "Hozirgi rasm"
 
 
 @admin.register(Experience)
