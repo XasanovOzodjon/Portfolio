@@ -1,11 +1,52 @@
-# Byte-compiled / optimized / DLL files
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+
+# Database
+db.sqlite3
+*.sqlite3
+*.sqlite3-journal
+
+# Python Bytecode
+*.pyc
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 
-# C extensions
-.Python
+# Static & Media Assets
+staticfiles/
+media/
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+
+# OS Specific Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# AI / Agent Artifacts
+.agents/
+.aider-desk/
+.aider*
+skills-lock.json
+
+# IDEs & Editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Build & Distribution
 build/
 develop-eggs/
 dist/
@@ -22,46 +63,5 @@ wheels/
 .installed.cfg
 *.egg
 
-# Database
-*.sqlite3
-*.sqlite3-journal
-db.sqlite3
-
-# Environment & secrets
-.env
-.env.*
-!.env.example
-
-# Virtual environments
-venv/
-.venv/
-env/
-ENV/
-
-# Static and media
-staticfiles/
-media/
-
-# IDE & Editor files
-.vscode/
-.idea/
-*.sublime-project
-*.sublime-workspace
-
-# OS files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
 # Logs
 *.log
-
-# AI / Agent folders
-.agents/
-.aider-desk/
-.aider*
-skills-lock.json

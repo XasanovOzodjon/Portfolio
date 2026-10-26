@@ -172,14 +172,17 @@ export function initWorksWheel(container, options = {}) {
     // Bottom subtle info badge on card
     const cardInfo = document.createElement("div");
     cardInfo.className = "pointer-events-none absolute left-3.5 bottom-3.5 right-3.5 flex items-center justify-between";
-    cardInfo.innerHTML = `
-      <span class="text-[11px] font-mono tracking-wider text-white drop-shadow-sm font-semibold truncate max-w-[70%]">
-        ${item.title}
-      </span>
-      <span class="bg-white/95 text-neutral-900 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm flex items-center gap-1 group-hover:scale-105 transition-transform">
-        ${action} ↗
-      </span>
-    `;
+
+    const titleSpan = document.createElement("span");
+    titleSpan.className = "text-[11px] font-mono tracking-wider text-white drop-shadow-sm font-semibold truncate max-w-[70%]";
+    titleSpan.textContent = item.title || "";
+
+    const actionSpan = document.createElement("span");
+    actionSpan.className = "bg-white/95 text-neutral-900 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm flex items-center gap-1 group-hover:scale-105 transition-transform";
+    actionSpan.textContent = `${action} ↗`;
+
+    cardInfo.appendChild(titleSpan);
+    cardInfo.appendChild(actionSpan);
     face.appendChild(cardInfo);
 
     card.appendChild(face);

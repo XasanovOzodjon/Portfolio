@@ -1,4 +1,8 @@
+import logging
+from django.db import DatabaseError
 from .models import Project, MiniProject, Service, ContactMessage, Skill, Experience, User, Button, OriginFoundation
+
+logger = logging.getLogger(__name__)
 
 def admin_dashboard_stats(request):
     """Context processor providing dashboard metrics and feeds for admin."""
@@ -38,5 +42,9 @@ def admin_dashboard_stats(request):
             'dash_recent_mini_projects': recent_mini_projects,
             'dash_services_list': services_list,
         }
-    except Exception:
+    except DatabaseError as e:
+        logger.warning("Admin dashboard statistikalarini olishda ma'lumotlar bazasi xatosi yuz berdi: %s", e)
+        return {}
+    except Exception as e:
+        logger.exception("Admin dashboard context processorida kutilmagan xatolik yuz berdi: %s", e)
         return {}

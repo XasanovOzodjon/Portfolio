@@ -2,8 +2,12 @@ from modeltranslation.translator import register, TranslationOptions
 from .models import User, Service, Project, MiniProject, OriginFoundation, Button, ExperienceChapter
 
 
+class BaseTranslationOptions(TranslationOptions):
+    fallback_undefined = None
+
+
 @register(User)
-class UserTranslationOptions(TranslationOptions):
+class UserTranslationOptions(BaseTranslationOptions):
     fields = (
         'professional_title',
         'address1',
@@ -15,32 +19,32 @@ class UserTranslationOptions(TranslationOptions):
 
 
 @register(Service)
-class ServiceTranslationOptions(TranslationOptions):
+class ServiceTranslationOptions(BaseTranslationOptions):
     fields = ('title', 'description', 'deliverables')
 
 
 @register(Project)
-class ProjectTranslationOptions(TranslationOptions):
+class ProjectTranslationOptions(BaseTranslationOptions):
     fields = ('title', 'subtitle', 'description', 'stats')
 
 
 @register(MiniProject)
-class MiniProjectTranslationOptions(TranslationOptions):
+class MiniProjectTranslationOptions(BaseTranslationOptions):
     fields = ('title', 'subtitle', 'description', 'stats', 'deliverables')
 
 
 @register(OriginFoundation)
-class OriginFoundationTranslationOptions(TranslationOptions):
+class OriginFoundationTranslationOptions(BaseTranslationOptions):
     fields = ('badge', 'title', 'description', 'hud_phase')
 
 
 @register(Button)
-class ButtonTranslationOptions(TranslationOptions):
+class ButtonTranslationOptions(BaseTranslationOptions):
     fields = ('title',)
 
 
 @register(ExperienceChapter)
-class ExperienceChapterTranslationOptions(TranslationOptions):
+class ExperienceChapterTranslationOptions(BaseTranslationOptions):
     fields = (
         'button_label',
         'eyebrow',

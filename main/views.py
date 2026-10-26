@@ -1,10 +1,15 @@
+import html
 import json
+import logging
 import requests
 from django.conf import settings
+from django.core.cache import cache
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.http import JsonResponse, HttpResponse, HttpRequest
 from django.shortcuts import render, redirect
 from django.utils import translation
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 from .models import (
     User,
@@ -23,35 +28,84 @@ from .models import (
     ExperienceChapter
 )
 
+logger = logging.getLogger(__name__)
 
-def send_telegram_message(name, email, message, source="ECHO Portfolio v2"):
-    """Send a contact message to Telegram bot if credentials are configured."""
+# Rate limiting parametrlari
+RATE_LIMIT_REQUESTS = 5
+RATE_LIMIT_TIMEOUT = 60  # 1 daqiqa (soniyalarda)
+
+
+def sanitize_telegram_error(error_text: str, token: str | None) -> str:
+    """Telegram xatolik xabarlarida bot tokenini maskalash."""
+    if token and token in error_text:
+        return error_text.replace(token, "[REDACTED_TELEGRAM_TOKEN]")
+    return error_text
+
+
+def get_client_ip(request: HttpRequest) -> str:
+    """
+    Mijozning haqiqiy IP manzilini xavfsiz olish.
+    X-Forwarded-For ni ko'r-ko'rona ishonmaslik kerak (soxtalashtirish xavfi).
+    Nginx teskari proksi oxiriga haqiqiy remote_addr ni qo'shadi,
+    shuning uchun vergul bilan ajratilgan zanjirning eng oxirgi qiymatini olamiz.
+    """
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ips = [ip.strip() for ip in x_forwarded_for.split(',') if ip.strip()]
+        if ips:
+            return ips[-1]
+    return request.META.get('REMOTE_ADDR', '127.0.0.1')
+
+
+def send_telegram_message(name: str, email: str, message: str, source: str = "ECHO Portfolio v2") -> tuple[bool, str]:
+    """Send a contact message to Telegram bot using HTML parse mode and masked logging."""
     token = getattr(settings, 'TOKEN', None)
     chat_id = getattr(settings, 'CHAT_ID', None)
     
     if not token or not chat_id:
+        logger.info("Telegram xabari yuborilmadi: TOKEN yoki CHAT_ID sozlanmagan.")
         return True, "Xabar qabul qilindi (Telegram bot token sozlanmagan)."
 
-    telegram_text = (
-        f"🚀 *{source}* orqali yangi xabar!\n\n"
-        f"👤 *Ism:* {name}\n"
-        f"📧 *Email:* {email}\n"
-        f"💬 *Xabar:*\n{message}"
+    # HTML belgilarni xavfsiz escape qilish (XSS va Telegram parse_mode='HTML' buzilishini oldini olish)
+    safe_name = html.escape(str(name))
+    safe_email = html.escape(str(email))
+    safe_source = html.escape(str(source))
+    safe_message = html.escape(str(message))
+
+    # Telegram xabar chegarasi 4096 belgi; headerlarni hisobga olib xabarni qirqamiz
+    max_msg_len = 3500
+    if len(safe_message) > max_msg_len:
+        safe_message = safe_message[:max_msg_len] + "\n\n<i>[Xabar Telegram limiti sababli qisqartirildi]</i>"
+
+    telegram_html = (
+        f"🚀 <b>{safe_source}</b> orqali yangi xabar!\n\n"
+        f"👤 <b>Ism:</b> {safe_name}\n"
+        f"📧 <b>Email:</b> {safe_email}\n"
+        f"💬 <b>Xabar:</b>\n{safe_message}"
     )
     url = f"https://api.telegram.org/bot{token}/sendMessage"
     payload = {
         "chat_id": chat_id,
-        "text": telegram_text,
-        "parse_mode": "Markdown"
+        "text": telegram_html,
+        "parse_mode": "HTML"
     }
 
     try:
         response = requests.post(url, data=payload, timeout=8)
         if response.status_code == 200:
             return True, "Xabaringiz muvaffaqiyatli yuborildi! ✅"
-        return False, f"Telegram API xatosi ({response.status_code})"
+        
+        sanitized_resp = sanitize_telegram_error(response.text, token)
+        logger.error("Telegram API xatosi (status %s): %s", response.status_code, sanitized_resp)
+        return False, "Telegram API xatosi"
+    except requests.RequestException as e:
+        sanitized_err = sanitize_telegram_error(str(e), token)
+        logger.warning("Telegram so'rovida tarmoq xatosi: %s", sanitized_err)
+        return False, "Telegram tarmog'i bilan bog'lanishda xatolik."
     except Exception as e:
-        return False, f"Xabar yuborishda xatolik: {e}"
+        sanitized_err = sanitize_telegram_error(str(e), token)
+        logger.exception("Telegram xabarini yuborishda kutilmagan xatolik: %s", sanitized_err)
+        return False, "Kutilmagan xatolik."
 
 
 def get_portfolio_context():
@@ -133,13 +187,14 @@ def get_portfolio_context():
         "chapter_learning": chapter_learning,
         "chapter_freelance": chapter_freelance,
         "about_skills": about_skills,
-        "works_json": json.dumps(works_list),
-        "mini_projects_json": json.dumps(works_list),
-        "items_json": json.dumps(items_list),
-        "featured_projects_json": json.dumps(items_list),
+        "works_json": works_list,
+        "mini_projects_json": works_list,
+        "items_json": items_list,
+        "featured_projects_json": items_list,
     }
 
 
+@ensure_csrf_cookie
 def portfolio_view(request: HttpRequest) -> HttpResponse:
     """Render the ECHO Developer Portfolio with dynamic Django context."""
     lang = request.GET.get('lang') or request.COOKIES.get('django_language') or 'en'
@@ -248,45 +303,97 @@ def api_portfolio_data(request: HttpRequest) -> JsonResponse:
     return JsonResponse(data, safe=False, json_dumps_params={'ensure_ascii': False, 'indent': 2})
 
 
-@csrf_exempt
 def api_contact(request: HttpRequest) -> JsonResponse:
     """Handle contact submissions via Fetch / AJAX or standard form POST."""
     if request.method != "POST":
         return JsonResponse({"success": False, "message": "Faqat POST so'rov qabul qilinadi."}, status=405)
 
-    name = ""
-    email = ""
-    message = ""
+    client_ip = get_client_ip(request)
 
-    if request.content_type == "application/json":
+    # 1. Rate Limiting: 1 daqiqada maksimum 5 ta so'rov
+    cache_key = f"rl_contact_{client_ip}"
+    current_count = cache.get(cache_key, 0)
+    if current_count >= RATE_LIMIT_REQUESTS:
+        logger.warning("Rate limit oshib ketdi. IP: %s (so'rovlar soni: %d)", client_ip, current_count)
+        return JsonResponse({
+            "success": False,
+            "message": "Juda ko'p so'rov yuborildi. Iltimos, 1 daqiqadan so'ng qayta urinib ko'ring."
+        }, status=429)
+
+    # 2. JSON va Form ma'lumotlarini qabul qilish
+    content_type = request.content_type or ""
+    if "application/json" in content_type:
         try:
-            body = json.loads(request.body.decode("utf-8"))
-            name = body.get("name", "").strip()
-            email = body.get("email", "").strip()
-            message = body.get("message", "").strip()
-        except Exception:
-            pass
+            body_bytes = request.body or b"{}"
+            raw_data = json.loads(body_bytes.decode("utf-8"))
+            if not isinstance(raw_data, dict):
+                return JsonResponse({"success": False, "message": "Noto'g'ri JSON formati: ob'ekt kutilmoqda."}, status=400)
+        except (json.JSONDecodeError, UnicodeDecodeError) as e:
+            logger.warning("Yaroqsiz JSON so'rovi qabul qilindi (IP: %s): %s", client_ip, e)
+            return JsonResponse({"success": False, "message": "Yuborilgan JSON formati noto'g'ri."}, status=400)
     else:
-        name = request.POST.get("name", "").strip()
-        email = request.POST.get("email", "").strip()
-        message = request.POST.get("message", "").strip()
+        raw_data = request.POST.dict()
 
-    if not name or not email or not message:
-        return JsonResponse({"success": False, "message": "Iltimos, barcha maydonlarni to'ldiring."}, status=400)
+    # 3. Honeypot tekshiruvi (Anti-spam)
+    honeypot = str(raw_data.get("website", "")).strip()
+    if honeypot:
+        logger.warning("Spam honeypot faollashdi (IP: %s, qiymat: %s). So'rov e'tiborsiz qoldirildi.", client_ip, honeypot)
+        # Botni aldash uchun muvaffaqiyatli javob qaytaramiz, lekin bazaga saqlamaymiz
+        return JsonResponse({
+            "success": True,
+            "message": "Xabaringiz muvaffaqiyatli qabul qilindi! Rahmat, tez orada javob qaytaraman. ✅"
+        })
 
-    # Save to database
-    contact_obj = ContactMessage.objects.create(
-        name=name,
-        email=email,
-        message=message,
-        source="ECHO Portfolio v2"
-    )
+    # Rate limit hisoblagichini oshiramiz
+    cache.set(cache_key, current_count + 1, timeout=RATE_LIMIT_TIMEOUT)
 
-    # Send telegram message
-    sent_telegram, msg_text = send_telegram_message(name, email, message, "ECHO Portfolio v2")
-    if sent_telegram:
-        contact_obj.is_sent_to_telegram = True
-        contact_obj.save(update_fields=['is_sent_to_telegram'])
+    # 4. Maydonlarni olish va tozalash
+    name = str(raw_data.get("name", "")).strip()
+    email = str(raw_data.get("email", "")).strip()
+    message = str(raw_data.get("message", "")).strip()
+
+    # Bo'sh maydonlarni tekshirish
+    if not name:
+        return JsonResponse({"success": False, "message": "Iltimos, ismingizni kiriting."}, status=400)
+    if not email:
+        return JsonResponse({"success": False, "message": "Iltimos, email manzilingizni kiriting."}, status=400)
+    if not message:
+        return JsonResponse({"success": False, "message": "Iltimos, xabaringizni kiriting."}, status=400)
+
+    # Maydon uzunliklari tekshiruvi (Model bilan mos: name <= 100, email <= 150, message <= 3000)
+    if len(name) > 100:
+        return JsonResponse({"success": False, "message": "Ism 100 belgidan oshmasligi kerak."}, status=400)
+    if len(email) > 150:
+        return JsonResponse({"success": False, "message": "Email manzili 150 belgidan oshmasligi kerak."}, status=400)
+    if len(message) > 3000:
+        return JsonResponse({"success": False, "message": "Xabar matni 3000 belgidan oshmasligi kerak."}, status=400)
+
+    # Email formatini tekshirish
+    try:
+        validate_email(email)
+    except ValidationError:
+        return JsonResponse({"success": False, "message": "Email manzili noto'g'ri formatda kiritildi."}, status=400)
+
+    # 5. Ma'lumotlar bazasiga saqlash
+    try:
+        contact_obj = ContactMessage.objects.create(
+            name=name,
+            email=email,
+            message=message,
+            source="ECHO Portfolio v2"
+        )
+    except Exception as e:
+        logger.exception("Xabarni bazaga saqlashda xatolik yuz berdi: %s", e)
+        return JsonResponse({"success": False, "message": "Xabarni saqlashda server xatosi yuz berdi."}, status=500)
+
+    # 6. Telegramga yuborish (Telegram xatosi foydalanuvchiga bildirilmaydi)
+    try:
+        sent_telegram, _ = send_telegram_message(name, email, message, "ECHO Portfolio v2")
+        if sent_telegram:
+            contact_obj.is_sent_to_telegram = True
+            contact_obj.save(update_fields=['is_sent_to_telegram'])
+    except Exception as e:
+        logger.exception("Telegram xabari yuborish jarayonida xatolik: %s", e)
 
     return JsonResponse({
         "success": True,

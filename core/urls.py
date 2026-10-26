@@ -15,16 +15,13 @@ urlpatterns = [
     path('contact/', api_contact, name='contact'),
 ]
 
-# Ensure static files in STATICFILES_DIRS can also be served at root for relative imports
+# Statik va media fayllarga to'g'ridan-to'g'ri xizmat ko'rsatish (Nginx va lokal fallback uchun)
 static_dir = settings.STATICFILES_DIRS[0]
-
 urlpatterns += [
-    re_path(r'^(?P<path>.*\.(?:js|mjs|css|png|jpg|jpeg|webp|svg|gif|woff|woff2|ttf|ico|glb|gltf|mp4|webm))$', 
+    re_path(r'^(?P<path>.*\.(?:js|mjs|css|png|jpg|jpeg|webp|svg|gif|woff|woff2|ttf|ico|glb|gltf|mp4|webm|json))$', 
             serve, {'document_root': static_dir}),
     re_path(r'^(?P<path>(?:assets|Landing Page Assest|Project Images)/.*)$', 
             serve, {'document_root': static_dir}),
 ]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=static_dir)
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=static_dir)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

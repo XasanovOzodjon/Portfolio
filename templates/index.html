@@ -1,10 +1,16 @@
 <!DOCTYPE html>
-<html lang="{{ current_lang|default:'uz' }}" class="scroll-smooth">
+<html lang="{{ current_lang|default:'en' }}" class="scroll-smooth">
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>{% if user %}{{ user.first_name }} {{ user.last_name }} — {{ user.professional_title }}{% else %}Ozodjon Xasanov — Backend Developer & Architect{% endif %}</title>
   <meta name="description" content="Portfolio of {% if user %}{{ user.first_name }} {{ user.last_name }}{% else %}Ozodjon Xasanov{% endif %}, a backend developer and system architect specializing in Python, Django, REST APIs, and high-performance digital systems.">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
   
   <!-- Tailwind CSS v3 with Plugins -->
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -36,11 +42,9 @@
   <link rel="dns-prefetch" href="https://fonts.googleapis.com">
   <link rel="dns-prefetch" href="https://fonts.gstatic.com">
 
-  <!-- Asynchronous Non-Render-Blocking Font Loading with font-display: swap -->
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"></noscript>
-  <link rel="stylesheet" href="FlexCarousel.css">
+  <!-- Typography (Plus Jakarta Sans & JetBrains Mono) -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+  <link rel="stylesheet" href="/FlexCarousel.css">
   <style>
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
@@ -1137,6 +1141,12 @@
       </div>
       
       <form id="contact-form" onsubmit="submitContactForm(event)" class="space-y-4">
+        {% csrf_token %}
+        <!-- Honeypot anti-spam yashirin maydoni -->
+        <div style="display:none !important;" aria-hidden="true">
+          <label for="contact-website">Website</label>
+          <input type="text" id="contact-website" name="website" tabindex="-1" autocomplete="off">
+        </div>
         <div>
           <label data-i18n="modal_lbl_name" class="block text-xs font-bold uppercase tracking-wider text-neutral-700 mb-1">Your Name</label>
           <input type="text" id="contact-name" required placeholder="John Doe" class="w-full px-4 py-2.5 rounded-xl border border-neutral-300 focus:outline-none focus:border-black text-sm">
@@ -1311,6 +1321,32 @@
       }
     }
 
+    // XSS Sanitization Helpers
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function sanitizeUrl(rawUrl) {
+      if (!rawUrl || typeof rawUrl !== 'string') return '';
+      const trimmed = rawUrl.trim();
+      if (trimmed === '#' || trimmed.startsWith('#')) return '#';
+      try {
+        const parsed = new URL(trimmed, window.location.origin);
+        if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+          return parsed.href;
+        }
+      } catch (e) {
+        // Noto'g'ri URL
+      }
+      return '';
+    }
+
     // Modal Handlers
     function openProjectModal(itemOrKey) {
       let data = null;
@@ -1334,40 +1370,43 @@
       const defaultCategory = curLang === 'uz' ? 'ASOSIY LOYIHA' : (curLang === 'ru' ? 'ИЗБРАННЫЙ ПРОЕКТ' : 'FEATURED PROJECT');
       const category = data.subtitle || data.category || defaultCategory;
       const title = data.title || 'PROJECT DETAILS';
-      document.getElementById('modal-project-category').innerText = category;
-      document.getElementById('modal-project-title').innerText = title;
+      const categoryEl = document.getElementById('modal-project-category');
+      const titleEl = document.getElementById('modal-project-title');
+      if (categoryEl) categoryEl.textContent = category;
+      if (titleEl) titleEl.textContent = title;
       
       let html = '';
       if (data.src) {
-        const webpSrc = data.src.replace(/\.(png|jpe?g)$/i, '.webp');
-        const fallbackSrc = data.src.replace(/\.webp$/i, '.png');
+        const webpSrc = escapeHtml(data.src.replace(/\.(png|jpe?g)$/i, '.webp'));
+        const fallbackSrc = escapeHtml(data.src.replace(/\.webp$/i, '.png'));
+        const altText = escapeHtml(data.alt || title);
         html += `
           <div class="w-full h-52 sm:h-64 rounded-2xl overflow-hidden border border-neutral-200/80 bg-neutral-100 shadow-inner">
             <picture class="w-full h-full block">
               <source srcset="${webpSrc}" type="image/webp">
               <source srcset="${fallbackSrc}" type="image/png">
-              <img src="${webpSrc}" alt="${data.alt || title}" width="800" height="500" loading="lazy" decoding="async" class="w-full h-full object-cover object-top" onerror="this.src='${fallbackSrc}'" />
+              <img src="${webpSrc}" alt="${altText}" width="800" height="500" loading="lazy" decoding="async" class="w-full h-full object-cover object-top" onerror="this.src='${fallbackSrc}'" />
             </picture>
           </div>
         `;
       }
       if (data.description) {
-        html += `<p class="text-neutral-600 leading-relaxed font-normal text-sm sm:text-base text-center max-w-xl mx-auto">${data.description}</p>`;
+        html += `<p class="text-neutral-600 leading-relaxed font-normal text-sm sm:text-base text-center max-w-xl mx-auto">${escapeHtml(data.description)}</p>`;
       }
       if (data.stats) {
         html += `
           <div class="bg-neutral-50 p-4 rounded-2xl border border-neutral-200 text-center">
-            <p class="text-[11px] font-bold uppercase tracking-wider text-neutral-500 mb-1">${t.highlights_label || 'Key Highlights'}</p>
-            <p class="text-xs text-neutral-800 font-medium">${data.stats}</p>
+            <p class="text-[11px] font-bold uppercase tracking-wider text-neutral-500 mb-1">${escapeHtml(t.highlights_label || 'Key Highlights')}</p>
+            <p class="text-xs text-neutral-800 font-medium">${escapeHtml(data.stats)}</p>
           </div>
         `;
       }
       if (data.deliverables && data.deliverables.length) {
         html += `
           <div>
-            <h4 class="text-xs font-bold uppercase tracking-wider text-black mb-2 text-center">${t.deliverables || 'DELIVERABLES'}</h4>
+            <h4 class="text-xs font-bold uppercase tracking-wider text-black mb-2 text-center">${escapeHtml(t.deliverables || 'DELIVERABLES')}</h4>
             <ul class="list-disc pl-5 space-y-1 text-xs text-neutral-600 max-w-md mx-auto">
-              ${data.deliverables.map(d => `<li>${d}</li>`).join('')}
+              ${data.deliverables.map(d => `<li>${escapeHtml(d)}</li>`).join('')}
             </ul>
           </div>
         `;
@@ -1375,9 +1414,9 @@
       if (data.tools && data.tools.length) {
         html += `
           <div>
-            <h4 class="text-xs font-bold uppercase tracking-wider text-black mb-2 text-center">${t.tools_and_tech || 'TOOLS & TECH'}</h4>
+            <h4 class="text-xs font-bold uppercase tracking-wider text-black mb-2 text-center">${escapeHtml(t.tools_and_tech || 'TOOLS & TECH')}</h4>
             <div class="flex flex-wrap justify-center gap-2">
-              ${data.tools.map(t => `<span class="px-3 py-1 bg-neutral-100 border border-neutral-200 text-neutral-800 text-[10px] font-semibold rounded-full uppercase">${t}</span>`).join('')}
+              ${data.tools.map(tool => `<span class="px-3 py-1 bg-neutral-100 border border-neutral-200 text-neutral-800 text-[10px] font-semibold rounded-full uppercase">${escapeHtml(tool)}</span>`).join('')}
             </div>
           </div>
         `;
@@ -1385,16 +1424,17 @@
       html += `<div class="pt-4 flex flex-wrap justify-center items-center gap-3">`;
       
       // GitHub Button (with lock icon if private)
+      const safeGithub = sanitizeUrl(data.github_link);
       if (data.is_github_private) {
         html += `
           <span class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-neutral-100 text-neutral-600 border border-neutral-300 text-xs font-bold uppercase tracking-wider cursor-not-allowed select-none shadow-sm" title="Ushbu repozitoriy yopiq (Private)">
             <svg class="w-4 h-4 text-neutral-700" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.243 2 7 4.243 7 7v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7c0-2.757-2.243-5-5-5zm-3 5c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9V7zm3 10a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
-            <span>${t.private_github || '🔒 Private GitHub'}</span>
+            <span>${escapeHtml(t.private_github || '🔒 Private GitHub')}</span>
           </span>
         `;
-      } else if (data.github_link) {
+      } else if (safeGithub && safeGithub !== '#') {
         html += `
-          <a href="${data.github_link}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-white text-neutral-900 border border-neutral-300 text-xs font-bold uppercase tracking-wider hover:border-black hover:bg-neutral-50 transition-all shadow-sm hover:scale-105 active:scale-95">
+          <a href="${escapeHtml(safeGithub)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-white text-neutral-900 border border-neutral-300 text-xs font-bold uppercase tracking-wider hover:border-black hover:bg-neutral-50 transition-all shadow-sm hover:scale-105 active:scale-95">
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
             <span>GitHub ↗</span>
           </a>
@@ -1403,23 +1443,24 @@
         html += `
           <span class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-neutral-100 text-neutral-500 border border-neutral-200 text-xs font-bold uppercase tracking-wider cursor-not-allowed select-none shadow-sm" title="Repozitoriy mavjud emas yoki yopiq">
             <svg class="w-4 h-4 text-neutral-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.243 2 7 4.243 7 7v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7c0-2.757-2.243-5-5-5zm-3 5c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9V7zm3 10a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
-            <span>${t.private_github || '🔒 Private GitHub'}</span>
+            <span>${escapeHtml(t.private_github || '🔒 Private GitHub')}</span>
           </span>
         `;
       }
 
       // View Button (Live site)
-      if (data.link && data.link !== '#' && !data.link.startsWith('#')) {
+      const safeLink = sanitizeUrl(data.link);
+      if (safeLink && safeLink !== '#') {
         html += `
-          <a href="${data.link}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full bg-black text-white text-xs font-bold uppercase tracking-wider hover:bg-neutral-800 transition-all shadow-md hover:shadow-xl hover:scale-105 active:scale-95">
+          <a href="${escapeHtml(safeLink)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full bg-black text-white text-xs font-bold uppercase tracking-wider hover:bg-neutral-800 transition-all shadow-md hover:shadow-xl hover:scale-105 active:scale-95">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-            <span>${t.view_live || 'VIEW LIVE ↗'}</span>
+            <span>${escapeHtml(t.view_live || 'VIEW LIVE ↗')}</span>
           </a>
         `;
       } else {
         html += `
           <button onclick="event.stopPropagation(); closeProjectModal(); openContactModal();" class="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full bg-black text-white text-xs font-bold uppercase tracking-wider hover:bg-neutral-800 transition-all shadow-md hover:scale-105 active:scale-95">
-            <span>${t.inquire_btn || 'MUROJAAT QILISH ↗'}</span>
+            <span>${escapeHtml(t.inquire_btn || 'MUROJAAT QILISH ↗')}</span>
           </button>
         `;
       }
@@ -1482,6 +1523,21 @@
       }
     });
 
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+
     async function submitContactForm(e) {
       e.preventDefault();
       const name = document.getElementById('contact-name').value.trim();
@@ -1489,6 +1545,8 @@
       const service = document.getElementById('contact-service') ? document.getElementById('contact-service').value : 'General';
       const messageEl = document.getElementById('contact-message');
       const messageText = messageEl ? messageEl.value.trim() : '';
+      const honeypotEl = document.getElementById('contact-website');
+      const honeypot = honeypotEl ? honeypotEl.value.trim() : '';
 
       const submitBtn = e.target.querySelector('button[type="submit"]');
       const originalText = submitBtn ? submitBtn.innerText : 'SEND';
@@ -1497,17 +1555,23 @@
         submitBtn.disabled = true;
       }
 
+      const csrfToken = getCookie('csrftoken') || document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+
       try {
         const res = await fetch('/api/contact/', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+          },
           body: JSON.stringify({
             name: name,
             email: email,
-            message: `[Tanlangan yo'nalish: ${service}]\n${messageText}`
+            message: `[Tanlangan yo'nalish: ${service}]\n${messageText}`,
+            website: honeypot
           })
         });
-        const result = await res.json();
+        const result = await res.json().catch(() => ({ success: false, message: 'Serverdan noto\'g\'ri javob keldi.' }));
         closeContactModal();
         if (result.success) {
           showToast(result.message || `Rahmat, ${name}! Xabaringiz muvaffaqiyatli qabul qilindi.`);
@@ -1517,8 +1581,7 @@
         }
       } catch (err) {
         closeContactModal();
-        showToast(`Rahmat, ${name}! Xabaringiz qabul qilindi.`);
-        document.getElementById('contact-form').reset();
+        showToast('Tarmoqda xatolik yuz berdi. Qaytadan urinib ko\'ring.');
       } finally {
         if (submitBtn) {
           submitBtn.innerText = originalText;
@@ -1932,9 +1995,24 @@
     }
   </script>
 
+  {{ mini_projects_json|default:works_json|json_script:"django-works-data" }}
+  {{ featured_projects_json|default:items_json|json_script:"django-items-data" }}
+
   <script>
-    window.DJANGO_WORKS = {{ mini_projects_json|default:works_json|safe }};
-    window.DJANGO_ITEMS = {{ featured_projects_json|default:items_json|safe }};
+    function parseDjangoJson(id) {
+      const el = document.getElementById(id);
+      if (el && el.textContent) {
+        try {
+          const parsed = JSON.parse(el.textContent);
+          return Array.isArray(parsed) && parsed.length ? parsed : null;
+        } catch (e) {
+          console.warn("JSON parse error from #" + id, e);
+        }
+      }
+      return null;
+    }
+    window.DJANGO_WORKS = parseDjangoJson("django-works-data");
+    window.DJANGO_ITEMS = parseDjangoJson("django-items-data");
   </script>
 
   <!-- FlexCarousel Initialization (React Bits Component Engine) -->

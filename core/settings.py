@@ -2,47 +2,58 @@ from pathlib import Path
 from dotenv import load_dotenv
 import os
 from decouple import config, Csv
+from django.core.exceptions import ImproperlyConfigured
 
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = config("SECRET_KEY", default="Ozodjon-Portfolio-V2-SuperSecretKey-2026")
-DEBUG = config("DEBUG", default=True, cast=bool)
-ALLOWED_HOSTS = ['*']
+DEBUG = config("DEBUG", default=False, cast=bool)
 
-CSRF_TRUSTED_ORIGINS = [
-    'http://localhost',
-    'http://localhost:8000',
-    'http://localhost:8008',
-    'http://localhost:8009',
-    'http://127.0.0.1',
-    'http://127.0.0.1:8000',
-    'http://127.0.0.1:8008',
-    'http://127.0.0.1:8009',
-    'https://*.ngrok-free.app',
-    'https://*.ngrok-free.dev',
-    'https://*.ngrok.io',
-    'https://torchless-heath-noxious.ngrok-free.dev',
-    'https://khasanoff.uz',
-    'https://www.khasanoff.uz'
-]
+SECRET_KEY = config("SECRET_KEY", default="")
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = "django-insecure-ozodjon-portfolio-dev-secret-key-local-only-replace-in-prod"
+    else:
+        raise ImproperlyConfigured("SECRET_KEY environment variable is required when DEBUG is False.")
+
+DEFAULT_ALLOWED_HOSTS = "127.0.0.1,localhost,khasanoff.uz,www.khasanoff.uz"
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default=DEFAULT_ALLOWED_HOSTS, cast=Csv())
+
+DEFAULT_CSRF_TRUSTED_ORIGINS = (
+    "https://khasanoff.uz,https://www.khasanoff.uz,"
+    "http://127.0.0.1,http://127.0.0.1:8000,http://127.0.0.1:8008,http://127.0.0.1:8009,"
+    "http://localhost,http://localhost:8000,http://localhost:8008,http://localhost:8009"
+)
+CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default=DEFAULT_CSRF_TRUSTED_ORIGINS, cast=Csv())
+
+# Ngrok kerak bo'lsa, faqat DEBUG=True holatida env orqali aniq domen qo'shiladi
+if DEBUG:
+    DEBUG_NGROK_ORIGIN = config("DEBUG_NGROK_ORIGIN", default="")
+    if DEBUG_NGROK_ORIGIN and DEBUG_NGROK_ORIGIN not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(DEBUG_NGROK_ORIGIN)
+
+# Clickjacking himoyasi
+X_FRAME_OPTIONS = "DENY"
 
 if not DEBUG:
-    CSRF_COOKIE_SECURE = True
-    SESSION_COOKIE_SECURE = True
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_SSL_REDIRECT = True
-    SECURE_HSTS_SECONDS = 31536000
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 3600
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 else:
-    CSRF_COOKIE_SECURE = False
-    SESSION_COOKIE_SECURE = False
     SECURE_SSL_REDIRECT = False
-
-X_FRAME_OPTIONS = 'SAMEORIGIN'
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    SECURE_HSTS_SECONDS = 0
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+    SECURE_HSTS_PRELOAD = False
+    SECURE_CONTENT_TYPE_NOSNIFF = False
 
 TOKEN = config("TOKEN", default="")
 CHAT_ID = config("CHAT_ID", default="")
@@ -122,8 +133,8 @@ AUTH_PASSWORD_VALIDATORS = [
 from django.utils.translation import gettext_lazy as _
 
 LANGUAGES = (
-    ('uz', _("O'zbekcha")),
     ('en', _('English')),
+    ('uz', _("O'zbekcha")),
     ('ru', _('Русский')),
 )
 
@@ -132,9 +143,9 @@ TIME_ZONE = 'Asia/Tashkent'
 USE_I18N = True
 USE_TZ = True
 
-MODELTRANSLATION_DEFAULT_LANGUAGE = 'uz'
-MODELTRANSLATION_LANGUAGES = ('uz', 'en', 'ru')
-MODELTRANSLATION_FALLBACK_LANGUAGES = ('uz', 'en')
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'en'
+MODELTRANSLATION_LANGUAGES = ('en', 'uz', 'ru')
+MODELTRANSLATION_FALLBACK_LANGUAGES = ('en', 'uz')
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
@@ -149,3 +160,53 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SESSION_COOKIE_AGE = 86400
 SESSION_SAVE_EVERY_REQUEST = True
+
+# Kesh sozlamalari (Rate limiting va boshqa kesh operatsiyalari uchun)
+# Productionda ko'p workerli muhitda DatabaseCache yoki RedisCache tavsiya etiladi.
+CACHES = {
+    'default': {
+        'BACKEND': config(
+            'CACHE_BACKEND',
+            default='django.core.cache.backends.locmem.LocMemCache'
+        ),
+        'LOCATION': config('CACHE_LOCATION', default='portfolio_v2_cache'),
+    }
+}
+
+# Logging konfiguratsiyasi (barcha xatoliklar konsolga standart formatda chiqadi)
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[{asctime}] {levelname} [{name}:{lineno}] {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'main': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}
